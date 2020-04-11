@@ -83,9 +83,6 @@ void Processor::emulateCycle(std::string &output)
 	setBit(Registers.F,5,Flags.H);
 	setBit(Registers.F,4,Flags.C);
 
-	if(pc == 0xc00c)
-		pc = pc;
-
 	if(!Memory.boot_enabled)
 	{
 	//	std::cout <<(int)Memory.read(0xFF44) << '\n';
