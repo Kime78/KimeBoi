@@ -124,9 +124,7 @@ void Processor::emulateCycle(std::string &output)
 		//(((a&0xfff) + (b&0xfff)) & 0x1000) == 0x10 //11-12 carry
 		//(((a&0xffff) + (b&0xffff)) & 0x10000) == 0x10 //15-16 carry
 
-		///TO-DO
-		///F FLAG
-	
+		///TO-DO	
 		case 0x00: //good
 		{
 			pc++;

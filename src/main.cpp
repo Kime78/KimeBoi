@@ -28,7 +28,7 @@ int main()
     sf::Sprite test2;
     test2.setScale(sf::Vector2f(2.0f,2.0f));
     test2.setTexture(texture);
-
+    
 
     sf::Texture test_tex;
     sf::Uint8 draw_array [160 * 144 * 4] {0};
