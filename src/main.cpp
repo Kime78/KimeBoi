@@ -79,7 +79,7 @@ int main()
             game->Memory.write(0xFF44,i);
             std::string output = "";
             game->emulateCycle(output);
-            if(output != "")
+            if(output != "" && game->pc != 0x8014)
             {
                 output += "\t\tregs:\t\t";
                 output += "AF:" + game->to_hex(game->Registers.A << 8 | game->Registers.F) + " ";

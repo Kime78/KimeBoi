@@ -16,8 +16,7 @@
                 "-lsfml-graphics",
                 "-lsfml-window",
                 "-lsfml-system",
-                "-O0",
-                "-g",
+                "-O3",
                 "src\\KimeBoi.cpp",
                 "src\\ppu.cpp"
             ],
