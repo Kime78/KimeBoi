@@ -7,8 +7,6 @@
 std::ofstream fout;
 int main()
 {
-    
-    
     Processor *game = new Processor;
     fout.open("debug.out");
     game->initialise();
@@ -29,7 +27,6 @@ int main()
     test2.setScale(sf::Vector2f(2.0f,2.0f));
     test2.setTexture(texture);
     
-
     sf::Texture test_tex;
     sf::Uint8 draw_array [160 * 144 * 4] {0};
     sf::Sprite test_spr;
@@ -46,8 +43,6 @@ int main()
             if (event.type == sf::Event::Closed)
             {
                 fout.open("debug.out");
-                
-             
                 /*
                 
                 for(int i=0x8000;i<0xA000;i++)
@@ -61,18 +56,13 @@ int main()
                         fout << "<- " << i << " ";    
                     if(i == 0x9BFF)
                         fout <<  "\n\n\n\nend\n\n\n\n";   
-                }
-               
-                */
+                } */
                 fout.close();
                 window.close();
             }
                 
         }
-        
         window.clear();
-        
-        
         ppu->fetch_pixel_array(game->Memory);
          for(int i=0;i<160;i++)
          {
