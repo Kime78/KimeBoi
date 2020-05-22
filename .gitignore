@@ -1,2 +1,7 @@
 debug.out
 
+bin/
+bin/debug.out
+bin/KimeBoi.exe
+bin/tetris - requires MBC.gb
+.vscode/
