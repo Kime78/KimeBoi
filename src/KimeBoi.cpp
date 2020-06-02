@@ -1548,21 +1548,13 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x8E:
 		{
-			Flags.N = 0;
 			std::uint8_t res = Registers.A + Memory.read(Registers.H << 8 | Registers.L) + Flags.C;
-			std::uint8_t tmp = Memory.read(Registers.H << 8 | Registers.L) + Flags.C;
-			if((((Registers.A & 0xf) + (tmp & 0xf)) & 0x10) == 0x10)
-				Flags.H = 1;
-			else 
-				Flags.H = 0;
-			if((((Registers.A & 0xff) + (tmp & 0xff)) & 0x100) == 0x100)
-				Flags.C = 1;
-			else 
-				Flags.C = 0;
-			if(res == 0)
-				Flags.Z = 1;
-			else 
-				Flags.Z = 0;
+
+			Flags.N = 0;
+			Flags.H = ((((Registers.A & 0xf) + (Memory.read(Registers.H << 8 | Registers.L) & 0xf) + Flags.C) & 0x10) == 0x10);
+			Flags.C = ((((Registers.A & 0xff) + (Memory.read(Registers.H << 8 | Registers.L) & 0xff) + Flags.C) & 0x100) == 0x100);
+			Flags.Z = (res == 0);
+			
 			Registers.A = res;	
 			pc += 2;
 			break;
@@ -1749,22 +1741,13 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x9E:
 		{
-			std::uint8_t sub = Memory.read(Registers.H << 8 | Registers.L) - Flags.C;
+			std::uint8_t res = Registers.A - Memory.read(Registers.H << 8 | Registers.L) - Flags.C;
+			
 			Flags.N = 1;
-			//other flags
-			if(Registers.A - sub == 0)
-				Flags.Z = 1;
-			else
-				Flags.Z = 0;	
-			if((((Registers.A & 0xf) - (sub & 0xf)) & 0x10) == 0x10)
-				Flags.H = 1;
-			else
-				Flags.H = 0;
-			if((((Registers.A & 0xff) - (sub & 0xff)) & 0x100) == 0x100)
-				Flags.C = 1;
-			else
-				Flags.C = 0;	
-			Registers.A -= sub;
+			Flags.H = ((((Registers.A & 0xf) - (Memory.read(Registers.H << 8 | Registers.L) & 0xf) - Flags.C) & 0x10) == 0x10);
+			Flags.C = ((((Registers.A & 0xff) - (Memory.read(Registers.H << 8 | Registers.L) & 0xff) - Flags.C) & 0x100) == 0x100);
+			Flags.Z = (res == 0);
+			Registers.A = res;
 			pc++;
 			break;
 		}
