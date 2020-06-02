@@ -3002,12 +3002,14 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xDE:
 		{
+			std::uint8_t res = Registers.A - Memory.read(pc + 1) - Flags.C;
+			
 			Flags.N = 1;
-			Flags.Z = (Registers.A - Memory.read(pc + 1) - Flags.C);
 			Flags.H = ((((Registers.A & 0xf) - (Memory.read(pc + 1) & 0xf) - Flags.C) & 0x10) == 0x10);
 			Flags.C = ((((Registers.A & 0xff) - (Memory.read(pc + 1) & 0xff) - Flags.C) & 0x100) == 0x100);
+			Flags.Z = (res == 0);
+			Registers.A = res;
 			
-			Registers.A = Registers.A - Memory.read(pc + 1) - Flags.C;
 			pc += 2;
 			break;
 		}
