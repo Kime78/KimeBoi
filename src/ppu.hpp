@@ -19,7 +19,8 @@ class PPU
        // tiledata = (((mem.read(0xff40) >> 4) & 1) == 1) ? 0x8000 : 0x8800;
         tilemap = 0x9800;
         tiledata = 0x8000;
-        bgpalette = 0b11100100;
+        //bgpalette = 0b11100100;
+        bgpalette = 0b00011011;
     }
 
 

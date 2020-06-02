@@ -84,7 +84,7 @@ int main()
                 output += "\t\tSP:\t\t" + game->to_hex(game->sp);
                 output += "\t\t(SP)\t\t" + game->to_hex(game->Memory.read(game->sp-1) << 8 | game->Memory.read(game->sp-2));
 
-                fout << std::hex << output << std::endl;
+                //fout << std::hex << output << std::endl;
             }
                 
             for(int j=0;j<144;j++)
