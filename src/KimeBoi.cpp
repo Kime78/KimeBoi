@@ -196,19 +196,15 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x07: //maybe 
 		{
-			std::uint8_t msb = Flags.C;
-			Flags.C = (Registers.A >> 7) & 1;
-			Registers.A = (Registers.A << 1) | msb;
-			if(Registers.A == 0)
-				Flags.Z = 1;
-			else
-				Flags.Z = 0;
-				
+			bool msb = Registers.A >> 7;
+			Flags.C = msb;
+			Registers.A <<= 1;
+			Registers.A |= msb;
+			Flags.Z = 0;
 			Flags.N = 0;
 			Flags.H = 0;
-			Flags.C = 0;
 			pc++;
-			break;	
+			break;		
 		}
 		case 0x08:
 		{
@@ -2340,9 +2336,10 @@ void Processor::emulateCycle(std::string &output)
 			{
 				case 0x00: 
 				{
-					bool msb = Flags.C;
-					Flags.C = (Registers.B >> 7) & 1;
-					Registers.B = (Registers.B << 1) | msb;
+					bool msb = Registers.B >> 7;
+					Flags.C = msb;
+					Registers.B <<= 1;
+					Registers.B |= msb;
 					Flags.Z = (Registers.B == 0);
 					Flags.N = 0;
 					Flags.H = 0;
@@ -2351,9 +2348,10 @@ void Processor::emulateCycle(std::string &output)
 				}
 				case 0x01: 
 				{
-					bool msb = (Registers.C >> 8) & 1;
-					Flags.C = (Registers.C >> 7) & 1;
-					Registers.C = (Registers.C << 1) | msb;
+					bool msb = Registers.C >> 7;
+					Flags.C = msb;
+					Registers.C <<= 1;
+					Registers.C |= msb;
 					Flags.Z = (Registers.C == 0);
 					Flags.N = 0;
 					Flags.H = 0;
@@ -2362,9 +2360,10 @@ void Processor::emulateCycle(std::string &output)
 				}
 				case 0x02: 
 				{
-					bool msb = (Registers.D >> 8) & 1;
-					Flags.C = (Registers.D >> 7) & 1;
-					Registers.D = (Registers.D << 1) | msb;
+					bool msb = Registers.D >> 7;
+					Flags.C = msb;
+					Registers.D <<= 1;
+					Registers.D |= msb;
 					Flags.Z = (Registers.D == 0);
 					Flags.N = 0;
 					Flags.H = 0;
@@ -2373,9 +2372,10 @@ void Processor::emulateCycle(std::string &output)
 				}
 				case 0x03: 
 				{
-					bool msb = (Registers.E >> 8) & 1;
-					Flags.C = (Registers.E >> 7) & 1;
-					Registers.E = (Registers.E << 1) | msb;
+					bool msb = Registers.E >> 7;
+					Flags.C = msb;
+					Registers.E <<= 1;
+					Registers.E |= msb;
 					Flags.Z = (Registers.E == 0);
 					Flags.N = 0;
 					Flags.H = 0;
@@ -2384,9 +2384,10 @@ void Processor::emulateCycle(std::string &output)
 				}
 				case 0x04: 
 				{
-					bool msb = (Registers.H >> 8) & 1;
-					Flags.C = (Registers.H >> 7) & 1;
-					Registers.H = (Registers.H << 1) | msb;
+					bool msb = Registers.H >> 7;
+					Flags.C = msb;
+					Registers.H <<= 1;
+					Registers.H |= msb;
 					Flags.Z = (Registers.H == 0);
 					Flags.N = 0;
 					Flags.H = 0;
@@ -2395,9 +2396,10 @@ void Processor::emulateCycle(std::string &output)
 				}
 				case 0x05: 
 				{
-					bool msb = (Registers.L >> 8) & 1;
-					Flags.C = (Registers.L >> 7) & 1;
-					Registers.L = (Registers.L << 1) | msb;
+					bool msb = Registers.L >> 7;
+					Flags.C = msb;
+					Registers.L <<= 1;
+					Registers.L |= msb;
 					Flags.Z = (Registers.L == 0);
 					Flags.N = 0;
 					Flags.H = 0;
@@ -2407,7 +2409,7 @@ void Processor::emulateCycle(std::string &output)
 				case 0x06: 
 				{
 					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
-					bool msb = (hl >> 8) & 1;
+					bool msb = Flags.C;
 					Flags.C = (hl >> 7) & 1;
 					hl = (hl << 1) | msb;
 					Flags.Z = (hl == 0);
@@ -2419,9 +2421,10 @@ void Processor::emulateCycle(std::string &output)
 				}
 				case 0x07: 
 				{
-					bool msb = (Registers.A >> 8) & 1;
-					Flags.C = (Registers.A >> 7) & 1;
-					Registers.A = (Registers.A << 1) | msb;
+					bool msb = Registers.A >> 7;
+					Flags.C = msb;
+					Registers.A <<= 1;
+					Registers.A |= msb;
 					Flags.Z = (Registers.A == 0);
 					Flags.N = 0;
 					Flags.H = 0;
@@ -2523,17 +2526,91 @@ void Processor::emulateCycle(std::string &output)
 					pc += 2;
 					break;
 				}
-				case 0x11:
+				case 0x10: 
 				{
-					bool msb = (Registers.C >> 7) & 1;
-					bool nlsb = Flags.C;
-					Flags.C = msb;
-					Registers.C = (Registers.C << 1) | nlsb;
-					if(Registers.C == 0)
-						Flags.Z = 1;
-					else
-						Flags.Z = 0;
-						
+					bool msb = Flags.C;
+					Flags.C = (Registers.B >> 7) & 1;
+					Registers.B = (Registers.B << 1) | msb;
+					Flags.Z = (Registers.B == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;	
+				}
+				case 0x11: 
+				{
+					bool msb = Flags.C;
+					Flags.C = (Registers.C >> 7) & 1;
+					Registers.C = (Registers.C << 1) | msb;
+					Flags.Z = (Registers.C == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;	
+				}
+				case 0x12: 
+				{
+					bool msb = Flags.C;
+					Flags.C = (Registers.D >> 7) & 1;
+					Registers.D = (Registers.D << 1) | msb;
+					Flags.Z = (Registers.D == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;	
+				}
+				case 0x13: 
+				{
+					bool msb = Flags.C;
+					Flags.C = (Registers.E >> 7) & 1;
+					Registers.E = (Registers.E << 1) | msb;
+					Flags.Z = (Registers.E == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;	
+				}
+				case 0x14: 
+				{
+					bool msb = Flags.C;
+					Flags.C = (Registers.H >> 7) & 1;
+					Registers.H = (Registers.H << 1) | msb;
+					Flags.Z = (Registers.H == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;	
+				}
+				case 0x15: 
+				{
+					bool msb = Flags.C;
+					Flags.C = (Registers.L >> 7) & 1;
+					Registers.L = (Registers.L << 1) | msb;
+					Flags.Z = (Registers.L == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;	
+				}
+				case 0x16: 
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					bool msb = Flags.C;
+					Flags.C = (hl >> 7) & 1;
+					hl = (hl << 1) | msb;
+					Flags.Z = (hl == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;	
+				}
+				case 0x17: 
+				{
+					bool msb = Flags.C;
+					Flags.C = (Registers.A >> 7) & 1;
+					Registers.A = (Registers.A << 1) | msb;
+					Flags.Z = (Registers.A == 0);
 					Flags.N = 0;
 					Flags.H = 0;
 					pc += 2;
@@ -2549,7 +2626,7 @@ void Processor::emulateCycle(std::string &output)
 					Flags.C = Registers.B & 0x1;
 					Registers.B >>= 1;
 					Registers.B = msb << 7 | Registers.B;
-					if(Registers.C == 0)
+					if(Registers.B == 0)
 						Flags.Z = 1;
 					else 
 						Flags.Z = 0;	
@@ -2741,6 +2818,187 @@ void Processor::emulateCycle(std::string &output)
 					pc += 2;
 					break;
 				}
+				case 0x28:
+				{
+					Flags.C = Registers.B & 0x1;
+					Registers.B >>= 1;
+
+					Flags.Z = (Registers.B == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;
+				}
+				case 0x29:
+				{
+					Flags.C = Registers.C & 0x1;
+					Registers.C >>= 1;
+
+					Flags.Z = (Registers.C == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;
+				}
+				case 0x2A:
+				{
+					Flags.C = Registers.D & 0x1;
+					Registers.D >>= 1;
+
+					Flags.Z = (Registers.D == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;
+				}
+				case 0x2B:
+				{
+					Flags.C = Registers.E & 0x1;
+					Registers.E >>= 1;
+
+					Flags.Z = (Registers.E == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;
+				}
+				case 0x2C:
+				{
+					Flags.C = Registers.H & 0x1;
+					Registers.H >>= 1;
+
+					Flags.Z = (Registers.H == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;
+				}
+				case 0x2D:
+				{
+					Flags.C = Registers.L & 0x1;
+					Registers.L >>= 1;
+
+					Flags.Z = (Registers.L == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;
+				}
+				case 0x2E:
+				{
+					Flags.C = Memory.read(Registers.H << 8 | Registers.L) & 0x1;
+					std::uint16_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl >>= 1;
+
+					Flags.Z = (hl == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					Registers.H = hl >> 8;
+					Registers.L = hl & 0xff;
+					pc += 2;
+					break;
+				}
+				case 0x2F:
+				{
+					Flags.C = Registers.A & 0x1;
+					Registers.A >>= 1;
+
+					Flags.Z = (Registers.A == 0);
+					Flags.N = 0;
+					Flags.H = 0;
+					pc += 2;
+					break;
+				}
+				case 0x30: //swap
+				{
+					std::uint8_t tmp = Registers.B >> 4;
+					Registers.B <<= 4;
+					Registers.B = Registers.B | tmp;
+					if(Registers.B == 0)
+						Flags.Z = 1;
+					else 
+						Flags.Z = 0;
+					Flags.C = 0;
+					Flags.H = 0;
+					Flags.N = 0;		
+					pc += 2;
+					break;
+				}
+				case 0x31: //swap
+				{
+					std::uint8_t tmp = Registers.C >> 4;
+					Registers.C <<= 4;
+					Registers.C = Registers.C | tmp;
+					if(Registers.C == 0)
+						Flags.Z = 1;
+					else 
+						Flags.Z = 0;
+					Flags.C = 0;
+					Flags.H = 0;
+					Flags.N = 0;		
+					pc += 2;
+					break;
+				}
+				case 0x32: //swap
+				{
+					std::uint8_t tmp = Registers.D >> 4;
+					Registers.D <<= 4;
+					Registers.D = Registers.D | tmp;
+					if(Registers.D == 0)
+						Flags.Z = 1;
+					else 
+						Flags.Z = 0;
+					Flags.C = 0;
+					Flags.H = 0;
+					Flags.N = 0;		
+					pc += 2;
+					break;
+				}
+				case 0x33: //swap
+				{
+					std::uint8_t tmp = Registers.E >> 4;
+					Registers.E <<= 4;
+					Registers.E = Registers.E | tmp;
+					if(Registers.E == 0)
+						Flags.Z = 1;
+					else 
+						Flags.Z = 0;
+					Flags.C = 0;
+					Flags.H = 0;
+					Flags.N = 0;		
+					pc += 2;
+					break;
+				}
+				case 0x34: //swap
+				{
+					std::uint8_t tmp = Registers.H >> 4;
+					Registers.H <<= 4;
+					Registers.H = Registers.H | tmp;
+					if(Registers.H == 0)
+						Flags.Z = 1;
+					else 
+						Flags.Z = 0;
+					Flags.C = 0;
+					Flags.H = 0;
+					Flags.N = 0;		
+					pc += 2;
+					break;
+				}
+				case 0x35: //swap
+				{
+					std::uint8_t tmp = Registers.L >> 4;
+					Registers.L <<= 4;
+					Registers.L = Registers.L | tmp;
+					if(Registers.L == 0)
+						Flags.Z = 1;
+					else 
+						Flags.Z = 0;
+					Flags.C = 0;
+					Flags.H = 0;
+					Flags.N = 0;		
+					pc += 2;
+					break;
+				}
 				case 0x37: //swap
 				{
 					std::uint8_t tmp = Registers.A >> 4;
@@ -2755,7 +3013,6 @@ void Processor::emulateCycle(std::string &output)
 					Flags.N = 0;		
 					pc += 2;
 					break;
-				
 				}
 				case 0x38: //broken wohooo
 				{
@@ -2770,6 +3027,72 @@ void Processor::emulateCycle(std::string &output)
 					pc += 2;
 					break;
 				}
+				case 0x39: //broken wohooo
+				{
+					Flags.C = Registers.C & 0x1;
+					Flags.N = 0;
+					Flags.H = 0;
+					Registers.C >>= 1;
+					if (Registers.C == 0)
+						Flags.Z = 1;
+					else 
+						Flags.Z = 0;
+					pc += 2;
+					break;
+				}
+				case 0x3A: //broken wohooo
+				{
+					Flags.C = Registers.D & 0x1;
+					Flags.N = 0;
+					Flags.H = 0;
+					Registers.D >>= 1;
+					if (Registers.D == 0)
+						Flags.Z = 1;
+					else 
+						Flags.Z = 0;
+					pc += 2;
+					break;
+				}
+				case 0x3B: //broken wohooo
+				{
+					Flags.C = Registers.E & 0x1;
+					Flags.N = 0;
+					Flags.H = 0;
+					Registers.E >>= 1;
+					if (Registers.E == 0)
+						Flags.Z = 1;
+					else 
+						Flags.Z = 0;
+					pc += 2;
+					break;
+				}
+				case 0x3C: //broken wohooo
+				{
+					Flags.C = Registers.H & 0x1;
+					Flags.N = 0;
+					Flags.H = 0;
+					Registers.H >>= 1;
+					if (Registers.H == 0)
+						Flags.Z = 1;
+					else 
+						Flags.Z = 0;
+					pc += 2;
+					break;
+				}
+				case 0x3D: //broken wohooo
+				{
+					Flags.C = Registers.L & 0x1;
+					Flags.N = 0;
+					Flags.H = 0;
+					Registers.L >>= 1;
+					if (Registers.L == 0)
+						Flags.Z = 1;
+					else 
+						Flags.Z = 0;
+					pc += 2;
+					break;
+				}
+
 				case 0x3f:
 				{
 					Flags.C = Registers.A & 0x1;
