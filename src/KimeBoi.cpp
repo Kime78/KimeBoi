@@ -3161,22 +3161,1375 @@ void Processor::emulateCycle(std::string &output)
 					pc += 2;
 					break;
 				}
-				case 0x7C:
+				case 0x40:
 				{
-	
-					std::uint8_t tmp;
-					tmp = Registers.H >> 7;
-					tmp <<= 1;
-					tmp >>= 8;
-
-					if(tmp == 0)
-						Flags.Z = 1;
-					else 
-						Flags.Z = 0;
+					Flags.Z = ((Registers.B & 0x1) == 0);
 					Flags.N = 0;
 					Flags.H = 1;
+
 					pc += 2;
-					break;		
+					break;
+				}
+				case 0x41:
+				{
+					Flags.Z = ((Registers.C & 0x1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x42:
+				{
+					Flags.Z = ((Registers.D & 0x1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x43:
+				{
+					Flags.Z = ((Registers.E & 0x1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x44:
+				{
+					Flags.Z = ((Registers.H & 0x1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x45:
+				{
+					Flags.Z = ((Registers.L & 0x1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x46:
+				{
+					Flags.Z = ((Memory.read(Registers.H << 8 | Registers.L) & 0x1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x47:
+				{
+					Flags.Z = ((Registers.A & 0x1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x48:
+				{
+					Flags.Z = (((Registers.B & 0x2) >> 1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x49:
+				{
+					Flags.Z = (((Registers.C & 0x2) >> 1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x4A:
+				{
+					Flags.Z = (((Registers.D & 0x2) >> 1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x4B:
+				{
+					Flags.Z = (((Registers.E & 0x2) >> 1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x4C:
+				{
+					Flags.Z = (((Registers.H & 0x2) >> 1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x4D:
+				{
+					Flags.Z = (((Registers.L & 0x2) >> 1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x4E:
+				{
+					Flags.Z = (((Memory.read(Registers.H << 8 | Registers.L) & 0x2) >> 1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x4F:
+				{
+					Flags.Z = (((Registers.A & 0x2) >> 1) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x50:
+				{
+					Flags.Z = (((Registers.B & 0x4) >> 2) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x51:
+				{
+					Flags.Z = (((Registers.C & 0x4) >> 2) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x52:
+				{
+					Flags.Z = (((Registers.D & 0x4) >> 2) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x53:
+				{
+					Flags.Z = (((Registers.E & 0x4) >> 2) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x54:
+				{
+					Flags.Z = (((Registers.H & 0x4) >> 2) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x55:
+				{
+					Flags.Z = (((Registers.L & 0x4) >> 2) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x56:
+				{
+					Flags.Z = (((Memory.read(Registers.H << 8 | Registers.L) & 0x4) >> 2) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x57:
+				{
+					Flags.Z = (((Registers.A & 0x4) >> 2) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x58:
+				{
+					Flags.Z = (((Registers.B & 0x8) >> 3) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x59:
+				{
+					Flags.Z = (((Registers.C & 0x8) >> 3) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x5A:
+				{
+					Flags.Z = (((Registers.D & 0x8) >> 3) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x5B:
+				{
+					Flags.Z = (((Registers.E & 0x8) >> 3) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x5C:
+				{
+					Flags.Z = (((Registers.H & 0x8) >> 3) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x5D:
+				{
+					Flags.Z = (((Registers.L & 0x8) >> 3) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x5E:
+				{
+					Flags.Z = (((Memory.read(Registers.H << 8 | Registers.L) & 0x8) >> 3) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x5F:
+				{
+					Flags.Z = (((Registers.A & 0x8) >> 3) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x60:
+				{
+					Flags.Z = (((Registers.B & 0x10) >> 4) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x61:
+				{
+					Flags.Z = (((Registers.C & 0x10) >> 4) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x62:
+				{
+					Flags.Z = (((Registers.D & 0x10) >> 4) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x63:
+				{
+					Flags.Z = (((Registers.E & 0x10) >> 4) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x64:
+				{
+					Flags.Z = (((Registers.H & 0x10) >> 4) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x65:
+				{
+					Flags.Z = (((Registers.L & 0x10) >> 4) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x66:
+				{
+					Flags.Z = (((Memory.read(Registers.H << 8 | Registers.L) & 0x10) >> 4) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x67:
+				{
+					Flags.Z = (((Registers.A & 0x10) >> 4) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x68:
+				{
+					Flags.Z = (((Registers.B & 0x20) >> 5) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x69:
+				{
+					Flags.Z = (((Registers.C & 0x20) >> 5) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x6A:
+				{
+					Flags.Z = (((Registers.D & 0x20) >> 5) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x6B:
+				{
+					Flags.Z = (((Registers.E & 0x20) >> 5) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x6C:
+				{
+					Flags.Z = (((Registers.H & 0x20) >> 5) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x6D:
+				{
+					Flags.Z = (((Registers.L & 0x20) >> 5) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x6E:
+				{
+					Flags.Z = (((Memory.read(Registers.H << 8 | Registers.L) & 0x20) >> 5) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x6F:
+				{
+					Flags.Z = (((Registers.A & 0x20) >> 5) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x70:
+				{
+					Flags.Z = (((Registers.B & 0x40) >> 6) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x71:
+				{
+					Flags.Z = (((Registers.C & 0x40) >> 6) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x72:
+				{
+					Flags.Z = (((Registers.D & 0x40) >> 6) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x73:
+				{
+					Flags.Z = (((Registers.E & 0x40) >> 6) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x74:
+				{
+					Flags.Z = (((Registers.H & 0x40) >> 6) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x75:
+				{
+					Flags.Z = (((Registers.L & 0x40) >> 6) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x76:
+				{
+					Flags.Z = (((Memory.read(Registers.H << 8 | Registers.L) & 0x40) >> 6) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x77:
+				{
+					Flags.Z = (((Registers.A & 0x40) >> 6) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x78:
+				{
+					Flags.Z = (((Registers.B & 0x80) >> 7) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x79:
+				{
+					Flags.Z = (((Registers.C & 0x80) >> 7) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x7A:
+				{
+					Flags.Z = (((Registers.D & 0x80) >> 7) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x7B:
+				{
+					Flags.Z = (((Registers.E & 0x80) >> 7) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x7C:
+				{
+					Flags.Z = (((Registers.H & 0x80) >> 7) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x7D:
+				{
+					Flags.Z = (((Registers.L & 0x80) >> 7) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x7E:
+				{
+					Flags.Z = (((Memory.read(Registers.H << 8 | Registers.L) & 0x80) >> 7) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x7F:
+				{
+					Flags.Z = (((Registers.A & 0x80) >> 7) == 0);
+					Flags.N = 0;
+					Flags.H = 1;
+
+					pc += 2;
+					break;
+				}
+				case 0x80:
+				{
+					Registers.B &= ~(1UL << 0);
+					pc += 2;
+					break;
+				} 
+				case 0x81:
+				{
+					Registers.C &= ~(1UL << 0);
+					pc += 2;
+					break;
+				} 
+				case 0x82:
+				{
+					Registers.D &= ~(1UL << 0);
+					pc += 2;
+					break;
+				} 
+				case 0x83:
+				{
+					Registers.E &= ~(1UL << 0);
+					pc += 2;
+					break;
+				} 
+				case 0x84:
+				{
+					Registers.H &= ~(1UL << 0);
+					pc += 2;
+					break;
+				} 
+				case 0x85:
+				{
+					Registers.L &= ~(1UL << 0);
+					pc += 2;
+					break;
+				} 
+				case 0x86:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl &= ~(1UL << 0);
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				} 
+				case 0x87:
+				{
+					Registers.A &= ~(1UL << 0);
+					pc += 2;
+					break;
+				} 
+				case 0x88:
+				{
+					Registers.B &= ~(1UL << 1);
+					pc += 2;
+					break;
+				} 
+				case 0x89:
+				{
+					Registers.C &= ~(1UL << 1);
+					pc += 2;
+					break;
+				} 
+				case 0x8A:
+				{
+					Registers.D &= ~(1UL << 1);
+					pc += 2;
+					break;
+				} 
+				case 0x8B:
+				{
+					Registers.E &= ~(1UL << 1);
+					pc += 2;
+					break;
+				} 
+				case 0x8C:
+				{
+					Registers.H &= ~(1UL << 1);
+					pc += 2;
+					break;
+				} 
+				case 0x8D:
+				{
+					Registers.L &= ~(1UL << 1);
+					pc += 2;
+					break;
+				} 
+				case 0x8E:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl &= ~(1UL << 1);
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				} 
+				case 0x8F:
+				{
+					Registers.A &= ~(1UL << 1);
+					pc += 2;
+					break;
+				} 
+				case 0x90:
+				{
+					Registers.B &= ~(1UL << 2);
+					pc += 2;
+					break;
+				} 
+				case 0x91:
+				{
+					Registers.C &= ~(1UL << 2);
+					pc += 2;
+					break;
+				} 
+				case 0x92:
+				{
+					Registers.D &= ~(1UL << 2);
+					pc += 2;
+					break;
+				} 
+				case 0x93:
+				{
+					Registers.E &= ~(1UL << 2);
+					pc += 2;
+					break;
+				} 
+				case 0x94:
+				{
+					Registers.H &= ~(1UL << 2);
+					pc += 2;
+					break;
+				} 
+				case 0x95:
+				{
+					Registers.L &= ~(1UL << 2);
+					pc += 2;
+					break;
+				} 
+				case 0x96:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl &= ~(1UL << 2);
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				} 
+				case 0x97:
+				{
+					Registers.A &= ~(1UL << 2);
+					pc += 2;
+					break;
+				} 
+				case 0x98:
+				{
+					Registers.B &= ~(1UL << 3);
+					pc += 2;
+					break;
+				} 
+				case 0x99:
+				{
+					Registers.C &= ~(1UL << 3);
+					pc += 2;
+					break;
+				} 
+				case 0x9A:
+				{
+					Registers.D &= ~(1UL << 3);
+					pc += 2;
+					break;
+				} 
+				case 0x9B:
+				{
+					Registers.E &= ~(1UL << 3);
+					pc += 2;
+					break;
+				} 
+				case 0x9C:
+				{
+					Registers.H &= ~(1UL << 3);
+					pc += 2;
+					break;
+				} 
+				case 0x9D:
+				{
+					Registers.L &= ~(1UL << 3);
+					pc += 2;
+					break;
+				} 
+				case 0x9E:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl &= ~(1UL << 3);
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				} 
+				case 0x9F:
+				{
+					Registers.A &= ~(1UL << 3);
+					pc += 2;
+					break;
+				} 
+				case 0xA0:
+				{
+					Registers.B &= ~(1UL << 4);
+					pc += 2;
+					break;
+				} 
+				case 0xA1:
+				{
+					Registers.C &= ~(1UL << 4);
+					pc += 2;
+					break;
+				} 
+				case 0xA2:
+				{
+					Registers.D &= ~(1UL << 4);
+					pc += 2;
+					break;
+				} 
+				case 0xA3:
+				{
+					Registers.E &= ~(1UL << 4);
+					pc += 2;
+					break;
+				} 
+				case 0xA4:
+				{
+					Registers.H &= ~(1UL << 4);
+					pc += 2;
+					break;
+				} 
+				case 0xA5:
+				{
+					Registers.L &= ~(1UL << 4);
+					pc += 2;
+					break;
+				} 
+				case 0xA6:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl &= ~(1UL << 4);
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				} 
+				case 0xA7:
+				{
+					Registers.A &= ~(1UL << 4);
+					pc += 2;
+					break;
+				} 
+				case 0xA8:
+				{
+					Registers.B &= ~(1UL << 5);
+					pc += 2;
+					break;
+				} 
+				case 0xA9:
+				{
+					Registers.C &= ~(1UL << 5);
+					pc += 2;
+					break;
+				} 
+				case 0xAA:
+				{
+					Registers.D &= ~(1UL << 5);
+					pc += 2;
+					break;
+				} 
+				case 0xAB:
+				{
+					Registers.E &= ~(1UL << 5);
+					pc += 2;
+					break;
+				} 
+				case 0xAC:
+				{
+					Registers.H &= ~(1UL << 5);
+					pc += 2;
+					break;
+				} 
+				case 0xAD:
+				{
+					Registers.L &= ~(1UL << 5);
+					pc += 2;
+					break;
+				} 
+				case 0xAE:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl &= ~(1UL << 5);
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				} 
+				case 0xAF:
+				{
+					Registers.A &= ~(1UL << 5);
+					pc += 2;
+					break;
+				} 
+				case 0xB0:
+				{
+					Registers.B &= ~(1UL << 6);
+					pc += 2;
+					break;
+				} 
+				case 0xB1:
+				{
+					Registers.C &= ~(1UL << 6);
+					pc += 2;
+					break;
+				} 
+				case 0xB2:
+				{
+					Registers.D &= ~(1UL << 6);
+					pc += 2;
+					break;
+				} 
+				case 0xB3:
+				{
+					Registers.E &= ~(1UL << 6);
+					pc += 2;
+					break;
+				} 
+				case 0xB4:
+				{
+					Registers.H &= ~(1UL << 6);
+					pc += 2;
+					break;
+				} 
+				case 0xB5:
+				{
+					Registers.L &= ~(1UL << 6);
+					pc += 2;
+					break;
+				} 
+				case 0xB6:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl &= ~(1UL << 6);
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				} 
+				case 0xB7:
+				{
+					Registers.A &= ~(1UL << 6);
+					pc += 2;
+					break;
+				} 
+				case 0xB8:
+				{
+					Registers.B &= ~(1UL << 7);
+					pc += 2;
+					break;
+				} 
+				case 0xB9:
+				{
+					Registers.C &= ~(1UL << 7);
+					pc += 2;
+					break;
+				} 
+				case 0xBA:
+				{
+					Registers.D &= ~(1UL << 7);
+					pc += 2;
+					break;
+				} 
+				case 0xBB:
+				{
+					Registers.E &= ~(1UL << 7);
+					pc += 2;
+					break;
+				} 
+				case 0xBC:
+				{
+					Registers.H &= ~(1UL << 7);
+					pc += 2;
+					break;
+				} 
+				case 0xBD:
+				{
+					Registers.L &= ~(1UL << 7);
+					pc += 2;
+					break;
+				} 
+				case 0xBE:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl &= ~(1UL << 7);
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				} 
+				case 0xBF:
+				{
+					Registers.A &= ~(1UL << 7);
+					pc += 2;
+					break;
+				} 
+				case 0xC0:
+				{
+					Registers.B |= 0x1;
+					pc += 2;
+					break;
+				}
+				case 0xC1:
+				{
+					Registers.C |= 0x1;
+					pc += 2;
+					break;
+				}
+				case 0xC2:
+				{
+					Registers.D |= 0x1;
+					pc += 2;
+					break;
+				}
+				case 0xC3:
+				{
+					Registers.E |= 0x1;
+					pc += 2;
+					break;
+				}
+				case 0xC4:
+				{
+					Registers.H |= 0x1;
+					pc += 2;
+					break;
+				}
+				case 0xC5:
+				{
+					Registers.L |= 0x1;
+					pc += 2;
+					break;
+				}
+				case 0xC6:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl |= 0x1;
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				}
+				case 0xC7:
+				{
+					Registers.A |= 0x1;
+					pc += 2;
+					break;
+				}
+				case 0xC8:
+				{
+					Registers.B |= 0x2;
+					pc += 2;
+					break;
+				}
+				case 0xC9:
+				{
+					Registers.C |= 0x2;
+					pc += 2;
+					break;
+				}
+				case 0xCA:
+				{
+					Registers.D |= 0x2;
+					pc += 2;
+					break;
+				}
+				case 0xCB:
+				{
+					Registers.E |= 0x2;
+					pc += 2;
+					break;
+				}
+				case 0xCC:
+				{
+					Registers.H |= 0x2;
+					pc += 2;
+					break;
+				}
+				case 0xCD:
+				{
+					Registers.L |= 0x2;
+					pc += 2;
+					break;
+				}
+				case 0xCE:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl |= 0x2;
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				}
+				case 0xCF:
+				{
+					Registers.A |= 0x2;
+					pc += 2;
+					break;
+				}
+				case 0xD0:
+				{
+					Registers.B |= 0x4;
+					pc += 2;
+					break;
+				}
+				case 0xD1:
+				{
+					Registers.C |= 0x4;
+					pc += 2;
+					break;
+				}
+				case 0xD2:
+				{
+					Registers.D |= 0x4;
+					pc += 2;
+					break;
+				}
+				case 0xD3:
+				{
+					Registers.E |= 0x4;
+					pc += 2;
+					break;
+				}
+				case 0xD4:
+				{
+					Registers.H |= 0x4;
+					pc += 2;
+					break;
+				}
+				case 0xD5:
+				{
+					Registers.L |= 0x4;
+					pc += 2;
+					break;
+				}
+				case 0xD6:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl |= 0x4;
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				}
+				case 0xD7:
+				{
+					Registers.A |= 0x4;
+					pc += 2;
+					break;
+				}
+				case 0xD8:
+				{
+					Registers.B |= 0x8;
+					pc += 2;
+					break;
+				}
+				case 0xD9:
+				{
+					Registers.C |= 0x8;
+					pc += 2;
+					break;
+				}
+				case 0xDA:
+				{
+					Registers.D |= 0x8;
+					pc += 2;
+					break;
+				}
+				case 0xDB:
+				{
+					Registers.E |= 0x8;
+					pc += 2;
+					break;
+				}
+				case 0xDC:
+				{
+					Registers.H |= 0x8;
+					pc += 2;
+					break;
+				}
+				case 0xDD:
+				{
+					Registers.L |= 0x8;
+					pc += 2;
+					break;
+				}
+				case 0xDE:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl |= 0x8;
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				}
+				case 0xDF:
+				{
+					Registers.A |= 0x8;
+					pc += 2;
+					break;
+				}
+				case 0xE0:
+				{
+					Registers.B |= 0x10;
+					pc += 2;
+					break;
+				}
+				case 0xE1:
+				{
+					Registers.C |= 0x10;
+					pc += 2;
+					break;
+				}
+				case 0xE2:
+				{
+					Registers.D |= 0x10;
+					pc += 2;
+					break;
+				}
+				case 0xE3:
+				{
+					Registers.E |= 0x10;
+					pc += 2;
+					break;
+				}
+				case 0xE4:
+				{
+					Registers.H |= 0x10;
+					pc += 2;
+					break;
+				}
+				case 0xE5:
+				{
+					Registers.L |= 0x10;
+					pc += 2;
+					break;
+				}
+				case 0xE6:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl |= 0x10;
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				}
+				case 0xE7:
+				{
+					Registers.A |= 0x10;
+					pc += 2;
+					break;
+				}
+				case 0xE8:
+				{
+					Registers.B |= 0x20;
+					pc += 2;
+					break;
+				}
+				case 0xE9:
+				{
+					Registers.C |= 0x20;
+					pc += 2;
+					break;
+				}
+				case 0xEA:
+				{
+					Registers.D |= 0x20;
+					pc += 2;
+					break;
+				}
+				case 0xEB:
+				{
+					Registers.E |= 0x20;
+					pc += 2;
+					break;
+				}
+				case 0xEC:
+				{
+					Registers.H |= 0x20;
+					pc += 2;
+					break;
+				}
+				case 0xED:
+				{
+					Registers.L |= 0x20;
+					pc += 2;
+					break;
+				}
+				case 0xEE:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl |= 0x20;
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				}
+				case 0xEF:
+				{
+					Registers.A |= 0x20;
+					pc += 2;
+					break;
+				}
+				case 0xF0:
+				{
+					Registers.B |= 0x40;
+					pc += 2;
+					break;
+				}
+				case 0xF1:
+				{
+					Registers.C |= 0x40;
+					pc += 2;
+					break;
+				}
+				case 0xF2:
+				{
+					Registers.D |= 0x40;
+					pc += 2;
+					break;
+				}
+				case 0xF3:
+				{
+					Registers.E |= 0x40;
+					pc += 2;
+					break;
+				}
+				case 0xF4:
+				{
+					Registers.H |= 0x40;
+					pc += 2;
+					break;
+				}
+				case 0xF5:
+				{
+					Registers.L |= 0x40;
+					pc += 2;
+					break;
+				}
+				case 0xF6:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl |= 0x40;
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
+				}
+				case 0xF7:
+				{
+					Registers.A |= 0x40;
+					pc += 2;
+					break;
+				}
+				case 0xF8:
+				{
+					Registers.B |= 0x80;
+					pc += 2;
+					break;
+				}
+				case 0xF9:
+				{
+					Registers.C |= 0x80;
+					pc += 2;
+					break;
+				}
+				case 0xFA:
+				{
+					Registers.D |= 0x80;
+					pc += 2;
+					break;
+				}
+				case 0xFB:
+				{
+					Registers.E |= 0x80;
+					pc += 2;
+					break;
+				}
+				case 0xFC:
+				{
+					Registers.H |= 0x80;
+					pc += 2;
+					break;
+				}
+				case 0xFD:
+				{
+					Registers.L |= 0x80;
+					pc += 2;
+					break;
+				}
+				case 0xFE:
+				{
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					hl |= 0x80;
+					Memory.write(Registers.H << 8 | Registers.L, hl);
+					pc += 2;
+					break;
 				}
 				case 0xFF:
 				{
