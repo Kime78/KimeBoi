@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <iostream>
 #include <fstream>
+#include "interrupts.hpp"
+
 bool tmp = 0;
 int t = 0;
 unsigned char Processor::_Memory::read(unsigned short address)
@@ -16,7 +18,7 @@ unsigned char Processor::_Memory::read(unsigned short address)
 
 void Processor::_Memory::write(unsigned short address, unsigned char value)
 {
-	if (address <= 0x8000)
+	if (address < 0x8000)
 	{
 		std::cout << "Illegal writting at: " << address << std::endl;
 		return;
@@ -78,6 +80,7 @@ void Processor::initialise()
 
 void Processor::emulateCycle(std::string &output)
 {
+	handle_interrupt(this);
 	Registers.F = Registers.F & 0xF0;
 	setBit(Registers.F,7,Flags.Z);
 	setBit(Registers.F,6,Flags.N);
@@ -99,15 +102,17 @@ void Processor::emulateCycle(std::string &output)
 		printf("%c", c);
 		Memory.write(0xff02, 0x0);
 	}*/
-	if(pc == 0xDEF8)
+	if(pc == 0x51)
 		pc = pc;
- 	if(tmp != interupts)
+
+ 	if(tmp != IME && handled == 0) // this is triggered by the handling
 	{
+		
 		t++;
 		if(t == 2)
 		{
 			t = 0;
-			interupts = tmp;
+			IME = tmp;
 		}
 
 	}
@@ -4691,7 +4696,7 @@ void Processor::emulateCycle(std::string &output)
 			std::uint8_t hi;
 			low = Memory.read(sp++);
 			hi = Memory.read(sp++);
-			interupts = true;
+			IME = true;
 			pc = hi << 8 | low;
 			break; 
 		}
@@ -4869,6 +4874,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0xF3: //badish
 		{
 			tmp = false;
+			handled = 0;
 			pc++;
 			break;
 		}
@@ -4932,6 +4938,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0xFB: //badish
 		{
 			tmp = true;
+			handled = 0;
 			pc++;
 			break;
 		}

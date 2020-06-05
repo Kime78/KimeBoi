@@ -2,7 +2,7 @@
 #define KIMEBOI_HPP_INCLUDED
 #include <string>
 #include <vector>
-
+#include <stdint.h>
 
 class Processor
 {
@@ -53,8 +53,9 @@ class Processor
     unsigned short pc;
     unsigned short sp;
     unsigned short stack[128];
-    bool interupts = 0;
-    
+    bool IME = 0;
+    bool handled = 0;
+  
     //unsigned char gameMemory[0x100];
 public:
 
