@@ -14,6 +14,7 @@ class Processor
         bool boot_enabled = 1;
         unsigned char ram[32768];
         unsigned char boot[0x100];
+        std::uint64_t cycle_count;
         void write(unsigned short address, unsigned char value);
         unsigned char read(unsigned short address);
     }Memory;
@@ -55,6 +56,7 @@ class Processor
     unsigned short stack[128];
     bool IME = 0;
     bool handled = 0;
+    
   
     //unsigned char gameMemory[0x100];
 public:

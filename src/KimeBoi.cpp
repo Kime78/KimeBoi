@@ -4,11 +4,13 @@
 #include <iostream>
 #include <fstream>
 #include "interrupts.hpp"
+#include "timer.hpp"
 
 bool tmp = 0;
 int t = 0;
 unsigned char Processor::_Memory::read(unsigned short address)
 {
+	cycle_count += 4;
 	if(boot_enabled && address < 0x100)
 		return boot[address];
 	if (address < 0x8000)
@@ -18,6 +20,7 @@ unsigned char Processor::_Memory::read(unsigned short address)
 
 void Processor::_Memory::write(unsigned short address, unsigned char value)
 {
+	cycle_count += 4;
 	if (address < 0x8000)
 	{
 		std::cout << "Illegal writting at: " << address << std::endl;
@@ -54,7 +57,7 @@ void setBit (std::uint8_t& num, std::uint8_t bit, bool status)
 void Processor::initialise()
 {
 	
-
+	Memory.cycle_count = 0;
 	pc = 0;
 	Registers.A = 0x00;
 	Registers.B = 0x00;
@@ -81,6 +84,7 @@ void Processor::initialise()
 void Processor::emulateCycle(std::string &output)
 {
 	handle_interrupt(this);
+	increment_timer(this);
 	Registers.F = Registers.F & 0xF0;
 	setBit(Registers.F,7,Flags.Z);
 	setBit(Registers.F,6,Flags.N);
