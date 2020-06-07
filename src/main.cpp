@@ -81,7 +81,8 @@ int main()
                 output += "Z: " + game->to_hex(game->Flags.Z) + " ";
                 output += "C: " + game->to_hex(game->Flags.C) + " ";
                 output += "H: " + game->to_hex(game->Flags.H) + " ";
-                output += "\t\tSP:\t\t" + game->to_hex(game->sp);
+                //output += "\t\tSP:\t\t" + game->to_hex(game->sp);
+                output += "IF: " + game->to_hex(game->Memory.read(0xff0f));
                 output += "\t\t(SP)\t\t" + game->to_hex(game->Memory.read(game->sp-1) << 8 | game->Memory.read(game->sp-2));
 
                 fout << std::hex << output << std::endl;
