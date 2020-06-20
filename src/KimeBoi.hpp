@@ -4,19 +4,23 @@
 #include <vector>
 #include <stdint.h>
 
+
 class Processor
 {
 
     public: class _Memory
     {
     public:
+        int rom_offset = 0;
+        int ram_offset = 0;
+        bool rom_mode = 0;
         std::vector<unsigned char> rom;
         bool boot_enabled = 1;
         unsigned char ram[32768];
         unsigned char boot[0x100];
         std::uint64_t cycle_count;
-        void write(unsigned short address, unsigned char value);
-        unsigned char read(unsigned short address);
+        void write(unsigned short address, unsigned char value, bool cycles = 1);
+        unsigned char read(unsigned short address, bool cycles = 1);
     }Memory;
     std::string to_hex(int x)
     {
@@ -69,6 +73,6 @@ public:
 
 };
 
-
+void handle_inputs(Processor*);
 
 #endif // KIMEBOI_HPP_INCLUDED

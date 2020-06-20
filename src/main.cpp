@@ -36,7 +36,12 @@ int main()
     test_spr.setPosition(sf::Vector2f(0.0f,0.0f));
     while (window.isOpen())
     {   
+        //handle_inputs(game);
+
         
+        //this will be in a function 
+
+
         sf::Event event;
         while (window.pollEvent(event))
         {
@@ -64,11 +69,69 @@ int main()
         }
         window.clear();
         ppu->fetch_pixel_array(game->Memory);
+         if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+        {
+           // game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 4);
+            game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 1);
+            game->Memory.ram[0xFF0F - 0x8000] |= 0x1;
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+            //game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 4);
+            game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 0);
+            game->Memory.ram[0xFF0F - 0x8000] |= 0x1;
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+        {
+            //game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 4);
+            game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 2);
+            game->Memory.ram[0xFF0F - 0x8000] |= 0x1;
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+        {
+            //game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 4);
+            game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 3);
+            game->Memory.ram[0xFF0F - 0x8000] |= 0x1;
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) //start
+        {
+            std::cout << 'g';
+            //game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 5);
+            game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 3);
+            game->Memory.ram[0xFF0F - 0x8000] |= 0x1;
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::BackSlash)) //select
+        {
+            //game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 5);
+            game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 2);
+            game->Memory.ram[0xFF0F - 0x8000] |= 0x1;
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Slash)) //A
+        {
+            //game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 5);
+            game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 0);
+            game->Memory.ram[0xFF0F - 0x8000] |= 0x1;
+        }
+
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Quote)) //B
+        {
+            //game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 5);
+            game->Memory.ram[0xFF00 - 0x8000] &= ~(1UL << 1);
+            game->Memory.ram[0xFF0F - 0x8000] |= 0x1;
+        }
          for(int i=0;i<160;i++)
          {
             game->Memory.write(0xFF44,i);
             std::string output = "";
             game->emulateCycle(output);
+            
+       
             if(output != "" && game->pc != 0x8014)
             {
                 output += "\t\tregs:\t\t";
@@ -85,42 +148,48 @@ int main()
                 output += "IF: " + game->to_hex(game->Memory.read(0xff0f));
                 output += "\t\t(SP)\t\t" + game->to_hex(game->Memory.read(game->sp-1) << 8 | game->Memory.read(game->sp-2));
 
-                fout << std::hex << output << std::endl;
+                //fout << std::hex << output << std::endl;
             }
-                
+
+            //i should do the color pallette soon    
             for(int j=0;j<144;j++)
                 {
                     int index = 4*(i + 160*j);
                     if(ppu->pixel_array[i][j] == 0)
                     {
-                        draw_array[index + 0] = 255;
-                        draw_array[index + 1] = 255;
-                        draw_array[index + 2] = 255;
+                        draw_array[index + 0] = 155;
+                        draw_array[index + 1] = 188;
+                        draw_array[index + 2] = 15;
                         draw_array[index + 3] = 255;
+                       
                     }
                     
                     if(ppu->pixel_array[i][j] == 1)
                     {
-                        draw_array[index + 0] = 144;
-                        draw_array[index + 1] = 144;
-                        draw_array[index + 2] = 144;
+                        draw_array[index + 0] = 139;
+                        draw_array[index + 1] = 172;
+                        draw_array[index + 2] = 15;
                         draw_array[index + 3] = 255;
+                       
                     }
                     if(ppu->pixel_array[i][j] == 2)
                     {
-                        draw_array[index + 0] = 55;
-                        draw_array[index + 1] = 55;
-                        draw_array[index + 2] = 55;
-                        draw_array[index+ 3] = 255;
+                        draw_array[index + 0] = 48;
+                        draw_array[index + 1] = 98;
+                        draw_array[index + 2] = 48;
+                        draw_array[index + 3] = 255;
                     }  
                     if(ppu->pixel_array[i][j] == 3)
                     {
-                        draw_array[index + 0] = 0;
-                        draw_array[index + 1] = 0;
-                        draw_array[index + 2] = 0;
+                        draw_array[index + 0] = 15;
+                        draw_array[index + 1] = 56;
+                        draw_array[index + 2] = 15;
                         draw_array[index + 3] = 255;
                     }
                 }
+    
+                //game->Memory.ram[0xFF0F - 0x8000] |= 0x1; //cycleless write for vblank
+                
          }
         test_tex.update(draw_array);        
         test_spr.setTexture(test_tex);

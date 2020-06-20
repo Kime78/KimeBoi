@@ -8,22 +8,34 @@
 
 bool tmp = 0;
 int t = 0;
-unsigned char Processor::_Memory::read(unsigned short address)
+unsigned char Processor::_Memory::read(unsigned short address, bool cycles)
 {
-	cycle_count += 4;
+	if(cycles)
+		cycle_count += 4;
 	
 	if(boot_enabled && address < 0x100)
 		return boot[address];
-	if (address < 0x8000)
+	if (address < 0x4000)
 		return rom[address];
+	if(address < 0x8000)
+		return rom[address + rom_offset];	
 	return ram[address - 0x8000];
 }
 
-void Processor::_Memory::write(unsigned short address, unsigned char value)
+void Processor::_Memory::write(unsigned short address, unsigned char value, bool cycles)
 {
-	cycle_count += 4;
-	if(address == 0xFF0F)
-		cycle_count = cycle_count;
+	if(cycles)
+		cycle_count += 4;
+	if(address >= 0x2000 && address <= 0x3FFF) //rom switching
+	{
+		//if(rom_mode)
+			//rom_offset = value * 0x8000;
+		return;
+	}
+	if(address >= 0x6000 && address <= 0x7FFF)
+	{
+		return;
+	}
 	if (address < 0x8000)
 	{
 		std::cout << "Illegal writting at: " << address << std::endl;
@@ -59,7 +71,7 @@ void setBit (std::uint8_t& num, std::uint8_t bit, bool status)
 }
 void Processor::initialise()
 {
-	
+	//Memory.ram[0xFF00 - 0x8000] = 0xFF;
 	Memory.cycle_count = 0;
 	pc = 0;
 	Registers.A = 0x00;
@@ -86,6 +98,7 @@ void Processor::initialise()
 
 void Processor::emulateCycle(std::string &output)
 {
+	//Memory.ram[0xFF00 - 0x8000] = 0xFF; //faking joypad
 	increment_timer(this);
 	handle_interrupt(this);
 	Registers.F = Registers.F & 0xF0;
