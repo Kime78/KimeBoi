@@ -30,7 +30,7 @@ void Processor::_Memory::write(unsigned short address, unsigned char value, bool
 	if(address >= 0x2000 && address <= 0x4000) //rom switching
 	{
 		if(rom_mode)
-			rom_offset = value * 0x4000;
+			rom_offset = (value - 1) * 0x4000;
 		return;
 	}
 	if(address >= 0x6000 && address <= 0x7FFF)
@@ -87,7 +87,7 @@ void Processor::initialise()
 	Flags.N = 0;
 	Flags.Z = 0;
 	sp = 0xFFFF;
-	Memory.rom.resize(1048576);
+	Memory.rom.resize(65535);
 	for(int i = 0; i < 32768; i++)
 		Memory.rom[i] = 0; 
 	for(int i = 0; i < 32768; i++)
@@ -2211,6 +2211,8 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xBE: //needs confirmation
 		{
+			if(pc == 0xFF86)
+				pc = pc;
 			Flags.N = 1;
 			if(Registers.A < Memory.read(Registers.H << 8 | Registers.L))
 				Flags.C = 1;
@@ -4858,8 +4860,6 @@ void Processor::emulateCycle(std::string &output)
 		{
 			
 			std::uint16_t u16 = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
-			if(u16 == 0xDEF8)
-				pc = pc;
 			Memory.write(u16, Registers.A);
 			//memory[(pc+1) << 8 | pc+2] = Registers.A;
 			pc += 3;
