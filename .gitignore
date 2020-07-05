@@ -5,3 +5,5 @@ bin/debug.out
 bin/KimeBoi.exe
 bin/tetris - requires MBC.gb
 .vscode/
+src/problems.txt
+mooneye/

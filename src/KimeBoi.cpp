@@ -26,11 +26,12 @@ void Processor::_Memory::write(unsigned short address, unsigned char value, bool
 {
 	if(cycles)
 		cycle_count += 4;
-	if(address >= 0x2000 && address <= 0x3FFF) //rom switching
+
+	if(address >= 0x2000 && address <= 0x4000) //rom switching
 	{
-		//if(rom_mode)
-			//rom_offset = value * 0x8000;
 		return;
+		if(rom_mode)
+			rom_offset = value * 0x8000;
 	}
 	if(address >= 0x6000 && address <= 0x7FFF)
 	{
@@ -41,8 +42,6 @@ void Processor::_Memory::write(unsigned short address, unsigned char value, bool
 		std::cout << "Illegal writting at: " << address << std::endl;
 		return;
 	}
-	if(address == 0xFF01)
-		std::cout << "Blarg's Output: " << (char)value << '\n';
 	
 	ram[address - 0x8000] = value;
 }
@@ -88,12 +87,14 @@ void Processor::initialise()
 	Flags.N = 0;
 	Flags.Z = 0;
 	sp = 0xFFFF;
-	Memory.rom.resize(32768);
+	Memory.rom.resize(1048576);
 	for(int i = 0; i < 32768; i++)
 		Memory.rom[i] = 0; 
 	for(int i = 0; i < 32768; i++)
 		Memory.ram[i] = 0; 
-	//Memory.write(0xFF44, 144);	
+	//Memory.write(0xFF44, 144);
+	for(uint16_t p = 0xA000; p <= 0xBFFF; p++)
+		Memory.write(p,0xFF,0);	
 }
 
 void Processor::emulateCycle(std::string &output)
@@ -163,6 +164,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x02: //good
 		{
+			Memory.cycle_count += 4;
 			Memory.write(Registers.B << 8 | Registers.C, Registers.A);
 			pc++;
 			break;
@@ -626,7 +628,7 @@ void Processor::emulateCycle(std::string &output)
 				correction |= 0x06;
 			}
 
-			if (Flags.C|| (!Flags.N && (reg > 0x99))) {
+			if (Flags.C || (!Flags.N && (reg > 0x99))) {
 				correction |= 0x60;
 			}
 
@@ -752,7 +754,6 @@ void Processor::emulateCycle(std::string &output)
 			Memory.cycle_count += 4;
 			if(Flags.C == 0)
 			{
-				Memory.cycle_count += 4;
 				std::int8_t tmp = Memory.read(pc + 1);
 				pc += 2;
 				pc = pc + tmp;

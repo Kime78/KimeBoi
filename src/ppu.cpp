@@ -9,11 +9,8 @@ void PPU::fetch_pixel_array(Processor::_Memory mem)
     bool b1,b2;
     //FF40 lcdc
 
-    if((mem.ram[0xFF40 - 0x8000] & 0x10) >> 4 == 1)
-        tiledata = 0x8000;
-    else 
-        tiledata = 0x8800;    
-    
+    tilemap = (((mem.read(0xff40) >> 3) & 1) == 1) ? 0x9c00 : 0x9800; //put this elsewere
+    tiledata = (((mem.read(0xff40) >> 4) & 1) == 1) ? 0x8000 : 0x8800;
     std::int8_t SX,SY;
     SX = mem.read(0xFF43);
     SY = mem.read(0xFF42);

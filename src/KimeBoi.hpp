@@ -13,7 +13,7 @@ class Processor
     public:
         int rom_offset = 0;
         int ram_offset = 0;
-        bool rom_mode = 0;
+        bool rom_mode = 1;
         std::vector<unsigned char> rom;
         bool boot_enabled = 1;
         unsigned char ram[32768];
