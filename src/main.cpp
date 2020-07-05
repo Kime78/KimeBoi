@@ -128,7 +128,7 @@ int main()
                 output += "cycles: " + std::to_string(game->Memory.cycle_count) + "\t";
                 output += "joypad: " + game->to_hex(game->Memory.read(0xFF00,0));
 
-                fout << std::hex << output << std::endl;
+                //fout << std::hex << output << std::endl;
                 game->Memory.cycle_count += 2;
             }
 

@@ -29,9 +29,9 @@ void Processor::_Memory::write(unsigned short address, unsigned char value, bool
 
 	if(address >= 0x2000 && address <= 0x4000) //rom switching
 	{
-		return;
 		if(rom_mode)
-			rom_offset = value * 0x8000;
+			rom_offset = value * 0x4000;
+		return;
 	}
 	if(address >= 0x6000 && address <= 0x7FFF)
 	{
