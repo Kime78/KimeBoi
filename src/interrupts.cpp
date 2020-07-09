@@ -4,8 +4,8 @@ void handle_interrupt(Processor* cpu)
 {
     if(cpu->IME) // are the interrupts enabled
     {
-        std::uint8_t IE = cpu->Memory.read(0xFFFF); 
-        std::uint8_t IF = cpu->Memory.read(0xFF0F);
+        std::uint8_t IE = cpu->Memory.read(0xFFFF,0); 
+        std::uint8_t IF = cpu->Memory.read(0xFF0F,0);
         if(IF != 0) //If there is any interrupt requested
         {
             if(IF & 0x1) //VBlank request

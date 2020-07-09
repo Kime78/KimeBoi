@@ -11,7 +11,7 @@ int t = 0;
 unsigned char Processor::_Memory::read(unsigned short address, bool cycles)
 {
 	if(cycles)
-		cycle_count += 4;
+		cycles_taken += 4;
 	
 	if(boot_enabled && address < 0x100)
 		return boot[address];
@@ -25,16 +25,23 @@ unsigned char Processor::_Memory::read(unsigned short address, bool cycles)
 void Processor::_Memory::write(unsigned short address, unsigned char value, bool cycles)
 {
 	if(cycles)
-		cycle_count += 4;
+		cycles_taken += 4;
 
 	if(address >= 0x2000 && address <= 0x4000) //rom switching
 	{
 		if(rom_mode)
-			rom_offset = (value - 1) * 0x4000;
+				rom_offset = (value - 1) * 0x4000;
 		return;
 	}
 	if(address >= 0x6000 && address <= 0x7FFF)
 	{
+		if(value == 0)
+			rom_mode = 1;
+		else
+		{
+			rom_mode = 0;
+		}
+			
 		return;
 	}
 	if (address < 0x8000)
@@ -71,7 +78,7 @@ void setBit (std::uint8_t& num, std::uint8_t bit, bool status)
 void Processor::initialise()
 {
 	//Memory.ram[0xFF00 - 0x8000] = 0xFF;
-	Memory.cycle_count = 0;
+	Memory.cycles_taken = 0;
 	pc = 0;
 	Registers.A = 0x00;
 	Registers.B = 0x00;
@@ -100,14 +107,14 @@ void Processor::initialise()
 void Processor::emulateCycle(std::string &output)
 {
 	//Memory.ram[0xFF00 - 0x8000] = 0xFF; //faking joypad
-	increment_timer(this);
+	
 	handle_interrupt(this);
 	Registers.F = Registers.F & 0xF0;
 	setBit(Registers.F,7,Flags.Z);
 	setBit(Registers.F,6,Flags.N);
 	setBit(Registers.F,5,Flags.H);
 	setBit(Registers.F,4,Flags.C);
-
+	Memory.temp = Memory.cycles_taken;
 	if(!Memory.boot_enabled)
 	{
 		
@@ -115,7 +122,7 @@ void Processor::emulateCycle(std::string &output)
 	//	std::cout << pc << " ";
 	//	std::cout <<(int)Memory.read(pc) << " " <<(int)Memory.read(pc+1) << " " <<(int)Memory.read(pc+2) <<   std::hex;
 	//	std::cout << '\n';
-		output = to_hex(pc) + " " + to_hex((int)Memory.read(pc)) + " " + to_hex((int)Memory.read(pc+1)) + " " + to_hex((int)Memory.read(pc+2));
+		output = to_hex(pc) + " " + to_hex((int)Memory.read(pc,0)) + " " + to_hex((int)Memory.read(pc+1,0)) + " " + to_hex((int)Memory.read(pc+2,0));
 	}
 	//    blarggs test - serial output
 	/*if (Memory.read(0xff02) == 0x81) {
@@ -164,7 +171,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x02: //good
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			Memory.write(Registers.B << 8 | Registers.C, Registers.A);
 			pc++;
 			break;
@@ -241,7 +248,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x09: //done?
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			std::uint16_t bc = Registers.B << 8 | Registers.C;
 			std::uint16_t hl = Registers.H << 8 | Registers.L;
 			std::uint16_t res = hl + bc;
@@ -272,7 +279,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x0B: //good
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			std::uint16_t res = Registers.B << 8 | Registers.C;
 			res--;
 			Registers.B = res >> 8;
@@ -341,7 +348,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x10: //not now
 		{
-			//input shit
+			//input shit lol
 			pc += 1;
 			break;
 		}
@@ -367,7 +374,7 @@ void Processor::emulateCycle(std::string &output)
 
 		case 0x13: //good
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			std::uint16_t tmp = Registers.D << 8 | Registers.E;
 			tmp++;
 			Registers.D = tmp >> 8;
@@ -430,7 +437,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x18: //good
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			std::int8_t add = Memory.read(pc + 1);
 			pc += 2;
 			pc = pc + add;
@@ -439,7 +446,7 @@ void Processor::emulateCycle(std::string &output)
 		} 
 		case 0x19:
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			Flags.N = 0;
 			std::uint16_t hl,de,res;
 			hl = Registers.H << 8 | Registers.L;
@@ -471,7 +478,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x1B:
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			std::uint16_t res = Registers.D << 8 | Registers.E;
 			res--;
 			Registers.D = res >> 8;
@@ -533,10 +540,9 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x20: //good
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			if (Flags.Z == 0)
 			{
-				Memory.cycle_count += 4;
 				std::int8_t tmp = Memory.read(pc + 1);
 				pc += 2;
 				pc = pc + tmp;
@@ -568,7 +574,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x23: //good
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			std::uint16_t tmp = Registers.H << 8 | Registers.L;
 			tmp++;
 			Registers.H = tmp >> 8;
@@ -655,10 +661,9 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x28: //good
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			if(Flags.Z == 1)
 			{
-				Memory.cycle_count += 4;
 				std::int8_t tmp = Memory.read(pc + 1);
 				pc += 2;
 				pc = pc + tmp;
@@ -669,7 +674,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x29: //good
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			std::uint16_t hl = Registers.H << 8 | Registers.L;
 			Flags.N = 0;
 			Flags.H = (((((Registers.H << 8 | Registers.L) & 0xfff) + ((Registers.H << 8 | Registers.L) & 0xfff)) & 0x1000) == 0x1000);
@@ -693,6 +698,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x2B:
 		{
+			Memory.cycles_taken += 4;
 			std::uint16_t hl = Registers.H << 8 | Registers.L;
 			hl--;
 			Registers.H = hl >> 8;
@@ -751,7 +757,7 @@ void Processor::emulateCycle(std::string &output)
 		}
         case 0x30: //fixed
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			if(Flags.C == 0)
 			{
 				std::int8_t tmp = Memory.read(pc + 1);
@@ -782,6 +788,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x33:
 		{
+			Memory.cycles_taken += 4;
 			sp++;
 			pc++;
 			break;
@@ -790,7 +797,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0x34: //fixed
 		{
 			Flags.N = 0;
-			std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+			std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L,0);
 			if((((hl & 0xf) + (1 & 0xf)) & 0x10) == 0x10)
 				Flags.H = 1;
 			else
@@ -838,6 +845,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x38:  //good
 		{
+			Memory.cycles_taken += 4;
 			if(Flags.C == 1)
 			{
 				std::int8_t tmp = Memory.read(pc + 1);
@@ -850,6 +858,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x39: //fixed
 		{
+			Memory.cycles_taken += 4;
 			std::uint16_t result = (Registers.H << 8 | Registers.L) + sp;
 			Flags.N = 0;
 			if(((((Registers.H << 8 | Registers.L) & 0xfff) + ( sp & 0xfff)) & 0x1000) == 0x1000) 
@@ -883,6 +892,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0x3B:
 		{
+			Memory.cycles_taken += 4;
 			sp--;
 			pc++;
 			break;
@@ -2251,8 +2261,10 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xC0:
 		{
+			Memory.cycles_taken += 4;
 			if(Flags.Z == 0)
 			{
+				Memory.cycles_taken += 4;
 				std::uint16_t low;
 				std::uint16_t hi;
 				low = Memory.read(sp++);
@@ -2273,9 +2285,10 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xC2: //fixed
 		{
+			std::uint16_t add = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
 			if(Flags.Z == 0)
 			{
-				std::uint16_t add = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
+				Memory.cycles_taken += 4;
 				pc = add;
 				break;
 			}
@@ -2284,18 +2297,20 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xC3:
 		{
+			Memory.cycles_taken += 4;
 			pc = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
 			//pc += memory[pc + 2] << 8 | memory[pc + 1];
 			break;
 		}
 		case 0xC4:
 		{
-			Memory.cycle_count += 8;
+			Memory.cycles_taken += 8;
 			if(Flags.Z == 0)
 			{
 				Memory.write(--sp, (pc + 3) >> 8);
 				Memory.write(--sp, (pc + 3) & 0xFF);
 				pc = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
+				Memory.cycles_taken -= 4;
 				break;
 			}
 			pc += 3;
@@ -2303,6 +2318,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xC5:
 		{
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,Registers.B);
 			Memory.write(--sp,Registers.C);
 			pc++;
@@ -2317,11 +2333,11 @@ void Processor::emulateCycle(std::string &output)
 			else
 				Flags.Z = 0;
 			Flags.N = 0;
-			if((((Registers.A & 0xf) + (Memory.read(pc + 1) & 0xf)) & 0x10) == 0x10)
+			if((((Registers.A & 0xf) + (Memory.read(pc + 1,0) & 0xf)) & 0x10) == 0x10)
 				Flags.H = 1;
 			else 
 				Flags.H = 0;
-			if((((Registers.A & 0xff) + (Memory.read(pc + 1) & 0xff)) & 0x100) == 0x100)
+			if((((Registers.A & 0xff) + (Memory.read(pc + 1,0) & 0xff)) & 0x100) == 0x100)
 				Flags.C = 1;
 			else 
 				Flags.C = 0;
@@ -2332,6 +2348,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0xC7:
 		{
 			pc++;
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,pc >> 8);
 			Memory.write(--sp,pc & 0xFF);
 			pc = 0x0000;
@@ -2339,8 +2356,10 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xC8: //idk
 		{
+			Memory.cycles_taken += 4;
 			if(Flags.Z == 1)
 			{
+				Memory.cycles_taken += 4;
 				std::uint16_t low;
 				std::uint16_t hi;
 				low = Memory.read(sp++);
@@ -2354,6 +2373,7 @@ void Processor::emulateCycle(std::string &output)
 
 		case 0xC9: //fixed
 		{
+			Memory.cycles_taken += 4;
 			std::uint8_t low;
 			std::uint8_t hi;
 			low = Memory.read(sp++);
@@ -2364,8 +2384,10 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xCA:
 		{
+			Memory.cycles_taken += 8;
 			if(Flags.Z == 1)
 			{
+				Memory.cycles_taken -= 4;
 				pc = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
 				break;
 			}
@@ -4317,8 +4339,7 @@ void Processor::emulateCycle(std::string &output)
 				}
 				case 0xD6:
 				{
-					Memory.cycle_count -= 4;
-					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L);
+					std::uint8_t hl = Memory.read(Registers.H << 8 | Registers.L, 0);
 					hl |= 0x4;
 					Memory.write(Registers.H << 8 | Registers.L, hl);
 					pc += 2;
@@ -4590,12 +4611,13 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xCC: // sus
 		{
-			Memory.cycle_count += 8;
+			Memory.cycles_taken += 8;
 			if(Flags.Z == 1)
 			{
 				Memory.write(--sp, (pc + 3) >> 8);
 				Memory.write(--sp, (pc + 3) & 0xFF);
 				pc = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
+				Memory.cycles_taken -= 4;
 				break;
 			}
 			pc += 3;
@@ -4603,7 +4625,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xCD: //sus
 		{
-			Memory.cycle_count += 4;
+			Memory.cycles_taken += 4;
 			Memory.write(--sp, (pc + 3) >> 8);
 			Memory.write(--sp, (pc + 3) & 0xFF);
 			pc = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
@@ -4626,6 +4648,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0xCF:
 		{
 			pc++;
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,pc >> 8);
 			Memory.write(--sp,pc & 0xFF);
 			pc = 0x0000 + 0x08;
@@ -4633,12 +4656,14 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xD0:
 		{
+			Memory.cycles_taken += 4;
 			if(Flags.C == 0)
 			{
 				std::uint16_t low;
 				std::uint16_t hi;
 				low = Memory.read(sp++);
 				hi = Memory.read(sp++);
+				Memory.cycles_taken += 4;
 				pc = hi << 8 | low;
 				break; 
 			}
@@ -4654,9 +4679,11 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xD2:
 		{
+			Memory.cycles_taken += 8;
 			if(Flags.C == 0)
 			{
 				pc = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
+				Memory.cycles_taken -= 4;
 				break;
 			}
 			pc += 3;
@@ -4664,12 +4691,13 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xD4:
 		{
-			Memory.cycle_count += 8;
+			Memory.cycles_taken += 8;
 			if(Flags.C == 0)
 			{
 				Memory.write(--sp, (pc + 3) >> 8);
 				Memory.write(--sp, (pc + 3) & 0xFF);
 				pc = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
+				Memory.cycles_taken -= 4;
 				break;
 			}
 			pc += 3;
@@ -4678,6 +4706,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xD5:
 		{
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,Registers.D);
 			Memory.write(--sp,Registers.E);
 			pc++;
@@ -4685,13 +4714,13 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xD6: //have i solved the mistery
 		{
-			std::uint8_t res = Registers.A - Memory.read(pc + 1);
+			std::uint8_t res = Registers.A - Memory.read(pc + 1,0);
 			if(res == 0)
 				Flags.Z = 1;
 			else 
 				Flags.Z = 0;
 			
-			if(Registers.A < Memory.read(pc + 1))	
+			if(Registers.A < Memory.read(pc + 1,0))	
 				Flags.C = 1;
 			else
 			{
@@ -4712,6 +4741,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0xD7:
 		{
 			pc++;
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,pc >> 8);
 			Memory.write(--sp,pc & 0xFF);
 			pc = 0x0000 + 0x10;
@@ -4719,12 +4749,14 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xD8:
 		{
+			Memory.cycles_taken += 4;
 			if(Flags.C == 1)
 			{
 				std::uint16_t low;
 				std::uint16_t hi;
 				low = Memory.read(sp++);
 				hi = Memory.read(sp++);
+				Memory.cycles_taken += 4;
 				pc = hi << 8 | low;
 				break; 
 			}
@@ -4737,12 +4769,14 @@ void Processor::emulateCycle(std::string &output)
 			std::uint8_t hi;
 			low = Memory.read(sp++);
 			hi = Memory.read(sp++);
+			Memory.cycles_taken += 4;
 			IME = true;
 			pc = hi << 8 | low;
 			break; 
 		}
 		case 0xDA:
 		{
+			Memory.cycles_taken += 4;
 			if(Flags.C == 1)
 			{
 				pc = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
@@ -4753,12 +4787,13 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xDC: // sus
 		{
-			Memory.cycle_count += 8;
+			Memory.cycles_taken += 8;
 			if(Flags.C == 1)
 			{
 				Memory.write(--sp, (pc + 3) >> 8);
 				Memory.write(--sp, (pc + 3) & 0xFF);
 				pc = Memory.read(pc + 2) << 8 | Memory.read(pc + 1);
+				Memory.cycles_taken -= 4;
 				break;
 			}
 			pc += 3;
@@ -4769,8 +4804,8 @@ void Processor::emulateCycle(std::string &output)
 			std::uint8_t res = Registers.A - Memory.read(pc + 1) - Flags.C;
 			
 			Flags.N = 1;
-			Flags.H = ((((Registers.A & 0xf) - (Memory.read(pc + 1) & 0xf) - Flags.C) & 0x10) == 0x10);
-			Flags.C = ((((Registers.A & 0xff) - (Memory.read(pc + 1) & 0xff) - Flags.C) & 0x100) == 0x100);
+			Flags.H = ((((Registers.A & 0xf) - (Memory.read(pc + 1,0) & 0xf) - Flags.C) & 0x10) == 0x10);
+			Flags.C = ((((Registers.A & 0xff) - (Memory.read(pc + 1,0) & 0xff) - Flags.C) & 0x100) == 0x100);
 			Flags.Z = (res == 0);
 			Registers.A = res;
 			
@@ -4780,6 +4815,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0xDF:
 		{
 			pc++;
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,pc >> 8);
 			Memory.write(--sp,pc & 0xFF);
 			pc = 0x0000 + 0x18;
@@ -4787,17 +4823,17 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xE0:
 		{
-			if(0xFF00 + Memory.read(pc + 1) == 0xFF50)
+			if(0xFF00 + Memory.read(pc + 1,0) == 0xFF50)
 			{
 				Memory.boot_enabled = 0;
-			}
-				
+			}	
 			Memory.write(0xFF00 + Memory.read(pc + 1), Registers.A);
 			pc += 2;
 			break;
 		}
 		case 0xE1:
 		{
+			Memory.cycles_taken += 4;
 			Registers.L = Memory.read(sp++);
 			Registers.H = Memory.read(sp++);
 			pc += 1;
@@ -4811,6 +4847,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xE5:
 		{
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,Registers.H);
 			Memory.write(--sp,Registers.L);
 			pc++;
@@ -4832,6 +4869,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0xE7:
 		{
 			pc++;
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,pc >> 8);
 			Memory.write(--sp,pc & 0xFF);
 			pc = 0x0000 + 0x20;
@@ -4842,6 +4880,7 @@ void Processor::emulateCycle(std::string &output)
 			//(((a&0xfff) + (b&0xfff)) & 0x1000) == 0x10 //11-12 carry
 			//(((a&0xffff) + (b&0xffff)) & 0x10000) == 0x10 //15-16 carry
 			std::int8_t i8 = Memory.read(pc + 1);
+			Memory.cycles_taken += 8;
 			Flags.N = 0;
 			Flags.Z = 0;
 			Flags.H = ((((sp & 0xf) + (i8 & 0xf)) & 0x10) == 0x10);
@@ -4867,7 +4906,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xEE:
 		{
-			if((Registers.A ^ Memory.read(pc + 1)) == 0)
+			if((Registers.A ^ Memory.read(pc + 1,0)) == 0)
 				Flags.Z = 1;
 			else 
 				Flags.Z = 0;
@@ -4881,6 +4920,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0xEF:
 		{
 			pc++;
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,pc >> 8);
 			Memory.write(--sp,pc & 0xFF);
 			pc = 0x0028;
@@ -4920,6 +4960,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xF5: 
 		{
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,Registers.A);
 			Memory.write(--sp,Registers.F);
 			pc++;
@@ -4927,7 +4968,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xF6:
 		{
-			if((Registers.A | Memory.read(pc + 1)) == 0)
+			if((Registers.A | Memory.read(pc + 1,0)) == 0)
 				Flags.Z = 1;
 			else 
 				Flags.Z = 0;
@@ -4941,6 +4982,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0xF7: //maybe
 		{
 			pc++;
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,pc >> 8);
 			Memory.write(--sp,pc & 0xFF);
 			pc = 0x0000 + 0x30;
@@ -4949,6 +4991,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0xF8:
 		{
 			std::uint16_t hl;
+			Memory.cycles_taken += 4;
 			std::int8_t i8 = Memory.read(pc + 1);
 			Flags.N = 0;
 			Flags.Z = 0;
@@ -4964,6 +5007,7 @@ void Processor::emulateCycle(std::string &output)
 		}
 		case 0xF9:
 		{
+			Memory.cycles_taken += 4;
 			sp = Registers.H << 8 | Registers.L;
 			pc++;
 			break;
@@ -4996,6 +5040,7 @@ void Processor::emulateCycle(std::string &output)
 		case 0xFF: //bad
 		{
 			pc++;
+			Memory.cycles_taken += 4;
 			Memory.write(--sp,pc >> 8);
 			Memory.write(--sp,pc & 0xFF);
 			pc = 0x0000 + 0x38;
@@ -5003,8 +5048,10 @@ void Processor::emulateCycle(std::string &output)
 		}
 		default:
 		{
-			std::cout << std::hex <<(int)pc<<": " << (int)Memory.read(pc) <<"! " << std::endl;
+			std::cout << std::hex <<(int)pc<<": " << (int)Memory.read(pc,0) <<"! " << std::endl;
 			return;
 		}	
 	}
+	increment_timer(this);
+	Memory.cycles_taken = 0;
 }
