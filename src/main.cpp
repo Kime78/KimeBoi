@@ -14,7 +14,7 @@ int main()
     game->Memory.write(0xff44,0x90,0);
     PPU *ppu;
     ppu = new PPU;
-    sf::RenderWindow window(sf::VideoMode(320, 288), "KimeBoy");
+    sf::RenderWindow window(sf::VideoMode(320, 288), "KimeBoi");
     FILE *file = fopen("E:\\CodeBlocks Projects (C# is better)\\KimeBoi\\bin\\boot.gb", "rb");
 	int pos = 0;
 	while (fread(&game->Memory.boot[pos], 1, 1, file))
@@ -111,28 +111,43 @@ int main()
             game->Memory.write(0xFF44,i,0);
             
             
-       
-            if(output != "" && game->pc != 0x8014)
+            game->emulateCycle(output);
+            if(game->Memory.boot_enabled == 0 && game->pc != 0x8014)
             {
+
+                //output += "A: " + game->to_hex(game->Registers.A) + " ";
+                //output += "F: " + game->to_hex(game->Registers.F) + " ";
+
+                //output += "B: " + game->to_hex(game->Registers.B) + " ";
+               // output += "C: " + game->to_hex(game->Registers.C) + " ";
+
+                //output += "D: " + game->to_hex(game->Registers.D) + " ";
+                //output += "E: " + game->to_hex(game->Registers.E) + " ";
+
+                //output += "H: " + game->to_hex(game->Registers.H) + " ";
+                //output += "L: " + game->to_hex(game->Registers.L) + " ";
+
+                //output += "SP: " + game->to_hex(game->sp) + " ";
+                output += "" + game->to_hex(game->pc) + "\t";
                 //output += "\t\tregs:\t\t";
-                //output += "AF:" + game->to_hex(game->Registers.A << 8 | game->Registers.F) + " ";
-                //output += "BC:" + game->to_hex(game->Registers.B << 8 | game->Registers.C) + " ";
-                //output += "DE:" + game->to_hex(game->Registers.D << 8 | game->Registers.E) + " ";
-                //output += "HL:" + game->to_hex(game->Registers.H << 8 | game->Registers.L) + " ";
-                //output += "\t\tflags:\t\t";
-                //output += "N: " + game->to_hex(game->Flags.N) + " ";
-                //output += "Z: " + game->to_hex(game->Flags.Z) + " ";
-                //output += "C: " + game->to_hex(game->Flags.C) + " ";
-                //output += "H: " + game->to_hex(game->Flags.H) + " ";
+                output += "AF:\t" + game->to_hex(game->Registers.A << 8 | game->Registers.F) + "\t";
+                output += "BC:\t" + game->to_hex(game->Registers.B << 8 | game->Registers.C) + "\t";
+                output += "DE:\t" + game->to_hex(game->Registers.D << 8 | game->Registers.E) + "\t";
+                output += "HL:\t" + game->to_hex(game->Registers.H << 8 | game->Registers.L) + "\t";
+                output += "\t\tflags:\t\t";
+                output += "N:\t" + game->to_hex(game->Flags.N) + "\t";
+                output += "Z:\t" + game->to_hex(game->Flags.Z) + "\t";
+                output += "C:\t" + game->to_hex(game->Flags.C) + "\t";
+                output += "H:\t" + game->to_hex(game->Flags.H) + "\t";
                 //output += "\t\tSP:\t\t" + game->to_hex(game->sp);
                
                 //output += "\tcycles: " + std::to_string(game->Memory.cycle_count) + "\t";
                 output += "TIMA: " + game->to_hex(game->Memory.read(0xFF05,0));
 
                 fout << std::hex << output << std::endl;
-            }
                 output = "";
-                game->emulateCycle(output);
+            }
+                
 
             //i should do the color pallette soon    
             for(int j = 0; j < 144; j++)

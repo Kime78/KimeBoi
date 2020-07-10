@@ -20,7 +20,6 @@ class Processor
         unsigned char boot[0x100];
         std::uint64_t cycle_count {0};
         void write(unsigned short address, unsigned char value, bool cycles = 1);
-        std::uint64_t temp;
         int cycles_taken {0};
         unsigned char read(unsigned short address, bool cycles = 1);
     }Memory;

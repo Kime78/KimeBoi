@@ -1,5 +1,5 @@
 #pragma once
 #include "KimeBoi.hpp"
 
-void increment_timer(Processor*);
+void increment_timer(Processor*, int);
 

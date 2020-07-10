@@ -1,6 +1,6 @@
 #include "timer.hpp"
 
-void increment_timer(Processor* cpu)
+void increment_timer(Processor* cpu, int cycles)
 {
     //FUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUCK
 
@@ -10,7 +10,7 @@ void increment_timer(Processor* cpu)
     
     if(TAC == 0b00000100)
     {
-        cpu->Memory.cycle_count += cpu->Memory.cycles_taken;
+        cpu->Memory.cycle_count += cycles;
         while(cpu->Memory.cycle_count >= 1024)
         {
             if(TIMA == 0xff)
@@ -22,14 +22,14 @@ void increment_timer(Processor* cpu)
             {
                 cpu->Memory.write(0xFF05, cpu->Memory.read(0xFF05,0) + 1, 0);
             }
-            cpu->Memory.cycle_count -= 16;
+            cpu->Memory.cycle_count -= 1024;
         }
           
     }
 
     if(TAC == 0b00000101)
     {
-        cpu->Memory.cycle_count += cpu->Memory.cycles_taken;
+        cpu->Memory.cycle_count += cycles;
         while(cpu->Memory.cycle_count >= 16)
         {
             if(TIMA == 0xff)
@@ -49,7 +49,7 @@ void increment_timer(Processor* cpu)
 
     if(TAC == 0b00000110)
     {
-        cpu->Memory.cycle_count += cpu->Memory.cycles_taken;
+        cpu->Memory.cycle_count += cycles;
         while(cpu->Memory.cycle_count >= 64)
         {
             if(TIMA == 0xff)
@@ -61,13 +61,13 @@ void increment_timer(Processor* cpu)
             {
                 cpu->Memory.write(0xFF05, cpu->Memory.read(0xFF05,0) + 1, 0);
             }
-            cpu->Memory.cycle_count -= 16;
+            cpu->Memory.cycle_count -= 64;
         }
           
     }
     if(TAC == 0b00000111)
     {
-        cpu->Memory.cycle_count += cpu->Memory.cycles_taken;
+        cpu->Memory.cycle_count += cycles;
         while(cpu->Memory.cycle_count >= 256)
         {
             if(TIMA == 0xff)
@@ -79,7 +79,7 @@ void increment_timer(Processor* cpu)
             {
                 cpu->Memory.write(0xFF05, cpu->Memory.read(0xFF05,0) + 1, 0);
             }
-            cpu->Memory.cycle_count -= 16;
+            cpu->Memory.cycle_count -= 256;
         }
             
     }
