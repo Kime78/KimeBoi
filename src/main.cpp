@@ -40,7 +40,7 @@ int main()
 
 
         //random guess - STAT/VBlank interrupts being fired while LCD is disabled?
-        //game->Memory.write(0xFF0F, game->Memory.read(0xFF0F, 0) | 0x1, 0);
+        
 
         
         window.clear();
@@ -106,10 +106,13 @@ int main()
         }
         std::string output = "";
         for(int i = 0; i < 160; i++)
-         {
+        {
             game->Memory.write(0xFF00,0xFF,0);
             game->Memory.write(0xFF44,i,0);
-            
+            if(game->Memory.read(0xFF44,0) == game->Memory.read(0xFF45,0))
+                game->Memory.write(0xFF0F, game->Memory.read(0xFF0F, 0) | 0x2, 0);
+            //if(i == 144)
+               // game->Memory.write(0xFF0F, game->Memory.read(0xFF0F, 0) | 0x1, 0);
             
             game->emulateCycle(output);
             if(game->Memory.boot_enabled == 0 && game->pc != 0x8014)
@@ -128,23 +131,23 @@ int main()
                 //output += "L: " + game->to_hex(game->Registers.L) + " ";
 
                 //output += "SP: " + game->to_hex(game->sp) + " ";
-                output += "" + game->to_hex(game->pc) + "\t";
+               // output += "" + game->to_hex(game->pc) + "\t";
                 //output += "\t\tregs:\t\t";
-                output += "AF:\t" + game->to_hex(game->Registers.A << 8 | game->Registers.F) + "\t";
-                output += "BC:\t" + game->to_hex(game->Registers.B << 8 | game->Registers.C) + "\t";
-                output += "DE:\t" + game->to_hex(game->Registers.D << 8 | game->Registers.E) + "\t";
-                output += "HL:\t" + game->to_hex(game->Registers.H << 8 | game->Registers.L) + "\t";
-                output += "\t\tflags:\t\t";
-                output += "N:\t" + game->to_hex(game->Flags.N) + "\t";
-                output += "Z:\t" + game->to_hex(game->Flags.Z) + "\t";
-                output += "C:\t" + game->to_hex(game->Flags.C) + "\t";
-                output += "H:\t" + game->to_hex(game->Flags.H) + "\t";
+               // output += "AF:\t" + game->to_hex(game->Registers.A << 8 | game->Registers.F) + "\t";
+               // output += "BC:\t" + game->to_hex(game->Registers.B << 8 | game->Registers.C) + "\t";
+               // output += "DE:\t" + game->to_hex(game->Registers.D << 8 | game->Registers.E) + "\t";
+               // output += "HL:\t" + game->to_hex(game->Registers.H << 8 | game->Registers.L) + "\t";
+                //output += "\t\tflags:\t\t";
+               // output += "N:\t" + game->to_hex(game->Flags.N) + "\t";
+                //output += "Z:\t" + game->to_hex(game->Flags.Z) + "\t";
+                //output += "C:\t" + game->to_hex(game->Flags.C) + "\t";
+                //output += "H:\t" + game->to_hex(game->Flags.H) + "\t";
                 //output += "\t\tSP:\t\t" + game->to_hex(game->sp);
                
                 //output += "\tcycles: " + std::to_string(game->Memory.cycle_count) + "\t";
-                output += "TIMA: " + game->to_hex(game->Memory.read(0xFF05,0));
+                //output += "joy: " + game->to_hex(game->Memory.read(0xFF00,0));
 
-                fout << std::hex << output << std::endl;
+                //fout << std::hex << output << std::endl;
                 output = "";
             }
                 
@@ -184,6 +187,7 @@ int main()
                         draw_array[index + 2] = 15;
                         draw_array[index + 3] = 255;
                     }
+                    
                 }
     
                // game->Memory.ram[0xFF0F - 0x8000] |= 0x1; //cycleless write for vblank
