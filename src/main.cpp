@@ -5,6 +5,16 @@
 #include <fstream>
 #include <string>
 std::ofstream fout;
+
+void gb_tick(Processor* cpu, PPU* ppu, sf::RenderWindow &window)
+{
+    int cycles_taken = 0;
+    cycles_taken = cpu->emulateCycle(); //this has timer and interrupts togheter
+    
+    ppu->tick_ppu(cycles_taken, cpu->Memory, window); //idea i should draw every frame and just update the frame buffer :P
+    
+}
+
 int main()
 {
     Processor *game;
@@ -15,6 +25,7 @@ int main()
     PPU *ppu;
     ppu = new PPU;
     sf::RenderWindow window(sf::VideoMode(320, 288), "KimeBoi");
+    window.setFramerateLimit(0);
     FILE *file = fopen("E:\\CodeBlocks Projects (C# is better)\\KimeBoi\\bin\\boot.gb", "rb");
 	int pos = 0;
 	while (fread(&game->Memory.boot[pos], 1, 1, file))
@@ -43,8 +54,8 @@ int main()
         
 
         
-        window.clear();
         
+        /*
         ppu->fetch_pixel_array(game->Memory);
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
         {
@@ -109,8 +120,12 @@ int main()
         {
             game->Memory.write(0xFF00,0xFF,0);
             game->Memory.write(0xFF44,i,0);
-            if(game->Memory.read(0xFF44,0) == game->Memory.read(0xFF45,0))
-                game->Memory.write(0xFF0F, game->Memory.read(0xFF0F, 0) | 0x2, 0);
+
+            //if((game->Memory.read(0xFF41) & 0x40) >> 6)
+                //if(game->Memory.read(0xFF44,0) == game->Memory.read(0xFF45,0))
+                    //game->Memory.write(0xFF0F, game->Memory.read(0xFF0F, 0) | 0x2, 0);
+
+                    
             //if(i == 144)
                // game->Memory.write(0xFF0F, game->Memory.read(0xFF0F, 0) | 0x1, 0);
             
@@ -198,6 +213,14 @@ int main()
         test_spr.setTexture(test_tex);
         window.draw(test_spr); 
         window.display();
+        */
+
+
+
+       gb_tick(game, ppu, window);
+
+
+
 
         sf::Event event;
         while (window.pollEvent(event))
