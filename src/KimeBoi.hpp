@@ -67,7 +67,7 @@ class Processor
 public:
 
     void loadGame(std::string path);
-    void emulateCycle(std::string& output);
+    int emulateCycle();
     void initialise();
     void initialiseOpenGL();
 

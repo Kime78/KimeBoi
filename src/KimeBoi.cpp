@@ -78,7 +78,7 @@ void setBit (std::uint8_t& num, std::uint8_t bit, bool status)
 void Processor::initialise()
 {
 	//Memory.ram[0xFF00 - 0x8000] = 0xFF;
-	Memory.cycles_taken = 0;
+
 	pc = 0;
 	Registers.A = 0x00;
 	Registers.B = 0x00;
@@ -94,7 +94,7 @@ void Processor::initialise()
 	Flags.N = 0;
 	Flags.Z = 0;
 	sp = 0xFFFF;
-	Memory.rom.resize(65535);
+	Memory.rom.resize(131072);//this should use the .push back thing
 	for(int i = 0; i < 32768; i++)
 		Memory.rom[i] = 0; 
 	for(int i = 0; i < 32768; i++)
@@ -104,7 +104,7 @@ void Processor::initialise()
 		Memory.write(p,0xFF,0);	
 }
 
-void Processor::emulateCycle(std::string &output)
+int Processor::emulateCycle()
 {
 	//Memory.ram[0xFF00 - 0x8000] = 0xFF; //faking joypad
 	
@@ -4595,7 +4595,7 @@ void Processor::emulateCycle(std::string &output)
 				default:
 				{
 					std::cout << std::hex <<(int)Memory.read(pc)  << " " << (int)Memory.read(pc + 1) << '\n';
-					return;
+					return Memory.cycles_taken;
 				}
 			}
 			break;
@@ -5044,9 +5044,9 @@ void Processor::emulateCycle(std::string &output)
 		default:
 		{
 			std::cout << std::hex <<(int)pc<<": " << (int)Memory.read(pc,0) <<"! " << std::endl;
-			return;
+			return Memory.cycles_taken;
 		}	
 	}
 	increment_timer(this,Memory.cycles_taken);
-	Memory.cycles_taken = 0;
+	return Memory.cycles_taken;
 }
