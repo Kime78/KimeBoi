@@ -7,7 +7,17 @@ void increment_timer(Processor* cpu, int cycles)
     //timer
     std::uint8_t TIMA = cpu->Memory.read(0xFF05, 0);
     std::uint8_t TAC = cpu->Memory.read(0xFF07, 0);
-    
+    std::uint8_t DIV = cpu->Memory.read(0xFF04, 0);
+
+    //DIV
+    cpu->div_cycles += cycles;
+    while(cpu->div_cycles >= 256)
+    {
+        cpu->Memory.write(0xFF04, DIV + 1, 0);
+        cpu->div_cycles -= 256;
+    }
+    //END OF DIV
+
     if(TAC == 0b00000100)
     {
         cpu->Memory.cycle_count += cycles;

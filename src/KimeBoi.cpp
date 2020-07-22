@@ -18,43 +18,83 @@ unsigned char Processor::_Memory::read(unsigned short address, bool cycles)
 	if(address == 0xff00) //joypad
 	{
 		
-		if((((ram[address - 0x8000]  & 0x20) >> 5) == 0)) //directions
+		if((((ram[address - 0x8000] & 0x10) >> 4) == 0)) //directions
 		{
 			if(keystates[RIGHT])
 			{
 				ram[address - 0x8000] &= ~(1UL << 0);
 			}
+			else
+			{
+				ram[address - 0x8000] |= 0x1;
+			}
+			
 			if(keystates[LEFT])
 			{
 				ram[address - 0x8000] &= ~(1UL << 1);
 			}
+			else
+			{
+				ram[address - 0x8000] |= 0x2;
+			}
+			
 			if(keystates[UP])
 			{
 				ram[address - 0x8000] &= ~(1UL << 2);
 			}
+			else
+			{
+				ram[address - 0x8000] |= 0x4;
+			}
+			
 			if(keystates[DOWN])
 			{
 				ram[address - 0x8000] &= ~(1UL << 3);
 			}
+			else
+			{
+				ram[address - 0x8000] |= 0x8;
+			}
+			
 		}
-		if((((ram[address - 0x8000] & 0x10) >> 4) == 0)) //buttons
+		if((((ram[address - 0x8000]  & 0x20) >> 5) == 0)) //buttons
 		{
 			if(keystates[A])
 			{
 				ram[address - 0x8000] &= ~(1UL << 0);
 			}
+			else
+			{
+				ram[address - 0x8000] |= 0x1;
+			}
+			
 			if(keystates[B])
 			{
 				ram[address - 0x8000] &= ~(1UL << 1);
 			}
+			else
+			{
+				ram[address - 0x8000] |= 0x2;
+			}
+			
 			if(keystates[SELECT])
 			{
 				ram[address - 0x8000] &= ~(1UL << 2);
 			}
+			else
+			{
+				ram[address - 0x8000] |= 0x4;
+			}
+			
 			if(keystates[START])
 			{
 				ram[address - 0x8000] &= ~(1UL << 3);
 			}
+			else
+			{
+				ram[address - 0x8000] |= 0x8;
+			}
+			
 		}
 		//std::cout << std::hex << (int)ram[address - 0x8000] << '\n';
 	}	

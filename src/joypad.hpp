@@ -15,42 +15,42 @@ void handle_input(Processor::_Memory& mem)
         mem.keystates[i] = 0;
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
-        mem.keystates[6] = 1;
+        mem.keystates[mem.LEFT] = 1;
     }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
-        mem.keystates[7] = 1;
+        mem.keystates[mem.RIGHT] = 1;
     }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
     {
-        mem.keystates[4] = 1;
+        mem.keystates[mem.UP] = 1;
     }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
-        mem.keystates[5] = 1;
+        mem.keystates[mem.DOWN] = 1;
     }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) //start
     {
-        mem.keystates[0] = 1;
+        mem.keystates[mem.START] = 1;
     }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::BackSlash)) //select
     {
-        mem.keystates[1] = 1;
+        mem.keystates[mem.SELECT] = 1;
     }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Slash)) //A
     {
-        mem.keystates[2] = 1;
+        mem.keystates[mem.A] = 1;
     }
 
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Quote)) //B
     {
-        mem.keystates[3] = 1;
+        mem.keystates[mem.B] = 1;
     }
 
     //for(int i = 0; i < 8; i++)

@@ -76,7 +76,7 @@ class Processor
     unsigned short stack[128];
     bool IME = 0;
     bool handled = 0;
-    
+    int div_cycles = 0;
   
     //unsigned char gameMemory[0x100];
 public:
