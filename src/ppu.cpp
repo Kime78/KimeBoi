@@ -103,7 +103,7 @@ void PPU::draw_sprites(Processor::_Memory mem)
 }
 
 
-void PPU::tick_ppu(int cycles, Processor::_Memory mem, sf::RenderWindow &window)
+void PPU::tick_ppu(int cycles, Processor::_Memory& mem, sf::RenderWindow &window)
 {
     
     while(cycles >= 4)
@@ -117,9 +117,10 @@ void PPU::tick_ppu(int cycles, Processor::_Memory mem, sf::RenderWindow &window)
                 //std::cout << 'o';
                 if(ppu_cycles == 0) //if the ppu was in hblank mode
                 {
-                   // std::cout << 'l';
+                    // std::cout << 'l';
                     ppu_line++;
-                    mem.write(0xFF44,ppu_line,0);
+                    LY++;
+                    //mem.write(0xFF44,ppu_line,0);
                     if((mem.read(0xFF41,0) & 0x40) >> 6) 
                         if(mem.read(0xFF44,0) == mem.read(0xFF45,0))
                             mem.write(0xFF0F, mem.read(0xFF0F, 0) | 0x2, 0);
@@ -158,6 +159,7 @@ void PPU::tick_ppu(int cycles, Processor::_Memory mem, sf::RenderWindow &window)
                     if(ppu_line == 144)
                     {
                         ppu_line = 0;
+                        //LY = 0; //this should be at the end of vblank
                         PPU_mode = Vblank;
                         ppu_cycles = -4;
                         
@@ -176,12 +178,15 @@ void PPU::tick_ppu(int cycles, Processor::_Memory mem, sf::RenderWindow &window)
             }
             case Vblank:
             {
+                if(ppu_cycles % 456)
+                    LY++;
                 //std::cout <<'v';
                 if(ppu_cycles == 0)
                 {
                     //increment LY in vblank
                     
                     mem.write(0xFF0F, mem.read(0xFF0F, 0) | 0x1, 0); // vblank interrupt
+                    
                     if((mem.read(0xFF41,0) & 0x8) >> 3) //is stat vblank interrupt enabled
                         mem.write(0xFF0F, mem.read(0xFF0F, 0) | 0x2, 0); //fire stat vblank
                     //draw_sprites(mem);
@@ -191,6 +196,7 @@ void PPU::tick_ppu(int cycles, Processor::_Memory mem, sf::RenderWindow &window)
                 }
                 if(ppu_cycles == 4560)
                 {
+                    LY = 0;
                     PPU_mode = OAM_Search;
                     ppu_cycles = -4;
                 }
@@ -230,7 +236,7 @@ void PPU::tick_ppu(int cycles, Processor::_Memory mem, sf::RenderWindow &window)
 
 }
 
-void PPU::oam_search(Processor::_Memory mem)
+void PPU::oam_search(Processor::_Memory& mem)
 {
     if(ppu_mode != 2) //if the ppu was in hblank mode
     {
@@ -243,7 +249,7 @@ void PPU::oam_search(Processor::_Memory mem)
     }
 }
 
-void PPU::hblank(Processor::_Memory mem)
+void PPU::hblank(Processor::_Memory& mem)
 {
     if(ppu_mode != 0)
     {
@@ -256,7 +262,7 @@ void PPU::hblank(Processor::_Memory mem)
         ppu_cycles = 0;
 }
 
-void PPU::vblank(Processor::_Memory mem, sf::RenderWindow &window)
+void PPU::vblank(Processor::_Memory& mem, sf::RenderWindow &window)
 {
     //std::cout << "vblank!\n";
     if(ppu_mode != 1)
@@ -272,8 +278,11 @@ void PPU::vblank(Processor::_Memory mem, sf::RenderWindow &window)
     }
 }
 
-void PPU::put_line(Processor::_Memory mem)
+void PPU::put_line(Processor::_Memory& mem)
 {
+    int SX,SY;
+    SX = mem.read(0xFF43,0);
+    SY = mem.read(0xFF42,0);
     tilemap = (((mem.read(0xff40,0) >> 3) & 1) == 1) ? 0x9c00 : 0x9800; //put this elsewere
     tiledata = (((mem.read(0xff40,0) >> 4) & 1) == 1) ? 0x8000 : 0x8800;
     uint16_t tile_start;
@@ -282,7 +291,7 @@ void PPU::put_line(Processor::_Memory mem)
         int y = ppu_line;
         int tile_x = x % 8;
         int tile_y = y % 8;
-        std::uint8_t tile_index = mem.read(tilemap + x / 8 + (y / 8)* 32, 0);
+        std::uint8_t tile_index = mem.read(tilemap + ((x + SX) % 256) / 8 + (((y + SY) % 256) / 8) * 32, 0);
                 
                 if(tiledata == 0x8800)
                 {
@@ -309,7 +318,7 @@ void PPU::put_line(Processor::_Memory mem)
 
 }
 
-void PPU::draw_frame(Processor::_Memory mem, sf::RenderWindow &window)
+void PPU::draw_frame(Processor::_Memory& mem, sf::RenderWindow &window)
 {
     sf::Uint8 draw_array [160 * 160 * 4] {0};
     for(int i = 0; i < 160; i++)

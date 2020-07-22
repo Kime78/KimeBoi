@@ -33,15 +33,15 @@ class PPU
         bgpalette = 0b00011011;
     }
 
-    void tick_ppu(int cycles, Processor::_Memory mem, sf::RenderWindow &window);
-    void oam_search(Processor::_Memory mem);
-    void hblank(Processor::_Memory mem);
-    void vblank(Processor::_Memory mem, sf::RenderWindow &window);
-    void put_line(Processor::_Memory mem);
-    void draw_frame(Processor::_Memory mem, sf::RenderWindow &window);
+    void tick_ppu(int cycles, Processor::_Memory& mem, sf::RenderWindow &window);
+    void oam_search(Processor::_Memory& mem);
+    void hblank(Processor::_Memory& mem);
+    void vblank(Processor::_Memory& mem, sf::RenderWindow &window);
+    void put_line(Processor::_Memory& mem);
+    void draw_frame(Processor::_Memory& mem, sf::RenderWindow &window);
     int ppu_cycles {0}, ppu_mode, ppu_line {-1};
     bool in_vblank = 0;
-
+    int LY;
     enum PPU_MODES
     {
         Vblank,

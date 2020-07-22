@@ -19,6 +19,21 @@ class Processor
         unsigned char ram[32768];
         unsigned char boot[0x100];
         std::uint64_t cycle_count {0};
+        bool keystates[8] {0};
+        //joypad be like 
+    	//start  select a b up down left right
+    	//  0       1   2 3 4    5   6     7 
+        enum Keys
+        {
+            START = 0,
+            SELECT = 1,
+            A = 2,
+            B = 3,
+            UP = 4,
+            DOWN = 5,
+            LEFT = 6,
+            RIGHT = 7,
+        };
         void write(unsigned short address, unsigned char value, bool cycles = 1);
         int cycles_taken {0};
         unsigned char read(unsigned short address, bool cycles = 1);
@@ -74,6 +89,6 @@ public:
 
 };
 
-void handle_inputs(Processor*);
+//void handle_inputs(Processor*);
 
 #endif // KIMEBOI_HPP_INCLUDED

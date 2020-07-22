@@ -15,6 +15,49 @@ unsigned char Processor::_Memory::read(unsigned short address, bool cycles)
 	
 	if(boot_enabled && address < 0x100)
 		return boot[address];
+	if(address == 0xff00) //joypad
+	{
+		
+		if((((ram[address - 0x8000]  & 0x20) >> 5) == 0)) //directions
+		{
+			if(keystates[RIGHT])
+			{
+				ram[address - 0x8000] &= ~(1UL << 0);
+			}
+			if(keystates[LEFT])
+			{
+				ram[address - 0x8000] &= ~(1UL << 1);
+			}
+			if(keystates[UP])
+			{
+				ram[address - 0x8000] &= ~(1UL << 2);
+			}
+			if(keystates[DOWN])
+			{
+				ram[address - 0x8000] &= ~(1UL << 3);
+			}
+		}
+		if((((ram[address - 0x8000] & 0x10) >> 4) == 0)) //buttons
+		{
+			if(keystates[A])
+			{
+				ram[address - 0x8000] &= ~(1UL << 0);
+			}
+			if(keystates[B])
+			{
+				ram[address - 0x8000] &= ~(1UL << 1);
+			}
+			if(keystates[SELECT])
+			{
+				ram[address - 0x8000] &= ~(1UL << 2);
+			}
+			if(keystates[START])
+			{
+				ram[address - 0x8000] &= ~(1UL << 3);
+			}
+		}
+		//std::cout << std::hex << (int)ram[address - 0x8000] << '\n';
+	}	
 	if (address < 0x4000)
 		return rom[address];
 	if(address < 0x8000)
@@ -26,7 +69,11 @@ void Processor::_Memory::write(unsigned short address, unsigned char value, bool
 {
 	if(cycles)
 		cycles_taken += 4;
-
+	if(address == 0xff00)
+	{
+		ram[0xff00 - 0x8000] = (value & 0b00110000) | (ram[0xff00 - 0x8000] & 0b11001111);
+		return;
+	}
 	if(address >= 0x2000 && address <= 0x4000) //rom switching
 	{
 		if(rom_mode)
@@ -102,6 +149,7 @@ void Processor::initialise()
 	//Memory.write(0xFF44, 144);
 	for(uint16_t p = 0xA000; p <= 0xBFFF; p++)
 		Memory.write(p,0xFF,0);	
+	Memory.ram[0xff00 - 0x8000] = 0xff;	
 }
 
 int Processor::emulateCycle()
@@ -117,7 +165,7 @@ int Processor::emulateCycle()
 	Memory.cycles_taken = 0;
 	
 	//    blarggs test - serial output
-	
+	//std::cout << (int)Memory.read(0xff44,0) << '\n';
 
  	if(tmp != IME && handled == 0) // this is triggered by the handling
 	{

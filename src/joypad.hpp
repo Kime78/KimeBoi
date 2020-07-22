@@ -2,64 +2,58 @@
 #include <SFML/Graphics.hpp>
 #include "KimeBoi.hpp"
 
-void handle_input(Processor::_Memory mem)
+void handle_input(Processor::_Memory& mem)
 {
+    //mem.write(0xff00,0xff,0);
+
+
+    //joypad be like 
+    //start  select a b up down left right
+    //  0       1   2 3 4    5   6     7 
+
+    for(int i=0; i < 8; i++)
+        mem.keystates[i] = 0;
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
-        {
-            mem.ram[0xFF00 - 0x8000] &= ~(1UL << 4);
-            mem.write(0xFF00,mem.read(0xFF00,0) & ~(1UL << 1),0);
-            //mem.ram[0xFF00 - 0x8000] &= ~(1UL << 1);
-            mem.ram[0xFF0F - 0x8000] |= 0x10;
+    {
+        mem.keystates[6] = 1;
+    }
 
-        }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+    {
+        mem.keystates[7] = 1;
+    }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
-        {
-            mem.ram[0xFF00 - 0x8000] &= ~(1UL << 4);
-            mem.write(0xFF00,mem.read(0xFF00,0) & ~(1UL << 0),0);
-            mem.ram[0xFF0F - 0x8000] |= 0x10;
-        }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+    {
+        mem.keystates[4] = 1;
+    }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
-        {
-            mem.ram[0xFF00 - 0x8000] &= ~(1UL << 4);
-            mem.write(0xFF00,mem.read(0xFF00,0) & ~(1UL << 2),0);
-            mem.ram[0xFF0F - 0x8000] |= 0x10;
-        }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+    {
+        mem.keystates[5] = 1;
+    }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
-        {
-            mem.ram[0xFF00 - 0x8000] &= ~(1UL << 4);
-            mem.write(0xFF00,mem.read(0xFF00,0) & ~(1UL << 3),0);
-            mem.ram[0xFF0F - 0x8000] |= 0x10;
-        }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) //start
+    {
+        mem.keystates[0] = 1;
+    }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Enter)) //start
-        {
-            mem.ram[0xFF00 - 0x8000] &= ~(1UL << 5);
-            mem.write(0xFF00,mem.read(0xFF00,0) & ~(1UL << 3),0);
-            mem.ram[0xFF0F - 0x8000] |= 0x10;
-        }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::BackSlash)) //select
+    {
+        mem.keystates[1] = 1;
+    }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::BackSlash)) //select
-        {
-            mem.ram[0xFF00 - 0x8000] &= ~(1UL << 5);
-            mem.write(0xFF00,mem.read(0xFF00,0) & ~(1UL << 2),0);
-            mem.ram[0xFF0F - 0x8000] |= 0x10;
-        }
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Slash)) //A
+    {
+        mem.keystates[2] = 1;
+    }
 
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Slash)) //A
-        {
-            mem.ram[0xFF00 - 0x8000] &= ~(1UL << 5);
-            mem.write(0xFF00,mem.read(0xFF00,0) & ~(1UL << 0),0);
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Quote)) //B
+    {
+        mem.keystates[3] = 1;
+    }
 
-            mem.ram[0xFF0F - 0x8000] |= 0x10;
-        }
-
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Quote)) //B
-        {
-            mem.ram[0xFF00 - 0x8000] &= ~(1UL << 5);
-            mem.write(0xFF00,mem.read(0xFF00,0) & ~(1UL << 1),0);
-            mem.ram[0xFF0F - 0x8000] |= 0x10;
-        }
+    //for(int i = 0; i < 8; i++)
+        //std::cout << mem.keystates[i];
+    //std::cout << '\n';    
 }
