@@ -102,6 +102,8 @@ unsigned char Processor::_Memory::read(unsigned short address, bool cycles)
 		return rom[address];
 	if(address < 0x8000)
 		return rom[address + rom_offset];	
+	if(address >= 0xA000 && address <= 0xBFFF)
+		return ram[address + ram_offset - 0x8000];	
 	return ram[address - 0x8000];
 }
 
@@ -114,11 +116,26 @@ void Processor::_Memory::write(unsigned short address, unsigned char value, bool
 		ram[0xff00 - 0x8000] = (value & 0b00110000) | (ram[0xff00 - 0x8000] & 0b11001111);
 		return;
 	}
+	if(address >= 0x0000 && address <= 0x1FFF)
+	{
+		uint8_t tmp = (value << 4) >> 4;
+		if(tmp == 0xA)
+			ram_enabled = 1;
+		else 
+			ram_enabled = 0;	
+		return;	
+	}
 	if(address >= 0x2000 && address <= 0x4000) //rom switching
 	{
 		if(rom_mode)
-				rom_offset = (value - 1) * 0x4000;
+			rom_offset = (value - 1) * 0x4000;
 		return;
+	}
+	if(address >= 0x4000 && address <= 0x5FFF)
+	{
+		if(ram_enabled)
+			ram_offset = (value - 1) * 0x4000;
+		return;	
 	}
 	if(address >= 0x6000 && address <= 0x7FFF)
 	{
@@ -136,7 +153,8 @@ void Processor::_Memory::write(unsigned short address, unsigned char value, bool
 		std::cout << "Illegal writting at: " << address << std::endl;
 		return;
 	}
-	
+	if(address >= 0xA000 && address <= 0xBFFF && ram_enabled && rom_mode)
+		ram[address + ram_offset - 0x8000] = value;
 	ram[address - 0x8000] = value;
 }
 
@@ -181,7 +199,7 @@ void Processor::initialise()
 	Flags.N = 0;
 	Flags.Z = 0;
 	sp = 0xFFFF;
-	Memory.rom.resize(131072);//this should use the .push back thing
+	Memory.rom.resize(16777216);//this should use the .push back thing
 	for(int i = 0; i < 32768; i++)
 		Memory.rom[i] = 0; 
 	for(int i = 0; i < 32768; i++)
@@ -196,7 +214,7 @@ int Processor::emulateCycle()
 {
 	//Memory.ram[0xFF00 - 0x8000] = 0xFF; //faking joypad
 	
-	handle_interrupt(this);
+	
 	Registers.F = Registers.F & 0xF0;
 	setBit(Registers.F,7,Flags.Z);
 	setBit(Registers.F,6,Flags.N);
@@ -218,7 +236,7 @@ int Processor::emulateCycle()
 		}
 
 	}
-
+	
 	switch (Memory.read(pc)) //+4
 	{
 		///example of combined registers
@@ -425,10 +443,9 @@ int Processor::emulateCycle()
 			pc++;
 			break;
 		}
-		case 0x10: //not now
+		case 0x10: //STOP
 		{
 			//input shit lol
-			pc += 1;
 			break;
 		}
 		case 0x11: //good
@@ -1352,8 +1369,9 @@ int Processor::emulateCycle()
 		}
 		case 0x76: //HALT
 		{
-			
-			if(Memory.ram[0xff0f - 0x8000])
+			std::uint8_t IF = Memory.read(0xFF0F, 0);
+			std::uint8_t IE = Memory.read(0xFFFF, 0);
+			if(IF != 0 && IE != 0)
 				pc++;
 			
 			break;
@@ -5135,6 +5153,7 @@ int Processor::emulateCycle()
 			return Memory.cycles_taken;
 		}	
 	}
+	handle_interrupt(this);
 	increment_timer(this,Memory.cycles_taken);
 	return Memory.cycles_taken;
 }

@@ -120,7 +120,8 @@ void PPU::tick_ppu(int cycles, Processor::_Memory& mem, sf::RenderWindow &window
                     // std::cout << 'l';
                     ppu_line++;
                     LY++;
-                    //mem.write(0xFF44,ppu_line,0);
+                    mem.write(0xFF44,LY,0);
+                  
                     if((mem.read(0xFF41,0) & 0x40) >> 6) 
                         if(mem.read(0xFF44,0) == mem.read(0xFF45,0))
                             mem.write(0xFF0F, mem.read(0xFF0F, 0) | 0x2, 0);
@@ -179,19 +180,20 @@ void PPU::tick_ppu(int cycles, Processor::_Memory& mem, sf::RenderWindow &window
             case Vblank:
             {
                 if(ppu_cycles % 456)
+                {
                     LY++;
+                    mem.write(0xFF44,LY,0);
+                }
                 //std::cout <<'v';
                 if(ppu_cycles == 0)
                 {
-                    //increment LY in vblank
                     
                     mem.write(0xFF0F, mem.read(0xFF0F, 0) | 0x1, 0); // vblank interrupt
                     
-                    if((mem.read(0xFF41,0) & 0x8) >> 3) //is stat vblank interrupt enabled
+                    if((mem.read(0xFF41,0) & 0x10) >> 4) //is stat vblank interrupt enabled
                         mem.write(0xFF0F, mem.read(0xFF0F, 0) | 0x2, 0); //fire stat vblank
-                    //draw_sprites(mem);
+                
                     draw_frame(mem, window);
-                    //draw_window(mem);
                     handle_input(mem);
                 }
                 if(ppu_cycles == 4560)
@@ -207,75 +209,7 @@ void PPU::tick_ppu(int cycles, Processor::_Memory& mem, sf::RenderWindow &window
             ppu_cycles += 4;
             
     }
-    /*
-    while(cycles >= 4)
-    {
-        
-        if(ppu_cyles <= 80) //oam
-        {
-            //std::cout << 'o';
-            oam_search(mem);
-        }
-        else if(ppu_cyles <= 172 + 80) //pixel transfer
-        {
-            //std::cout << 'p';
-            continue;
-        }
-        else if(ppu_cyles <= 204 + 172)//hblank
-        {
-            //std::cout << 'h';
-            hblank(mem);
-        }
-    }
-    
-    if(ppu_line == 145)
-    {
-       
-        vblank(mem, window);
-    }*/
 
-}
-
-void PPU::oam_search(Processor::_Memory& mem)
-{
-    if(ppu_mode != 2) //if the ppu was in hblank mode
-    {
-        
-        ppu_mode = 2;
-        ppu_line++;
-        
-        if((mem.read(0xFF41,0) & 0x20) >> 5) //is oam interrupt enabled
-            mem.write(0xFF0F, mem.read(0xFF0F, 0) | 0x2, 0); //fire stat
-    }
-}
-
-void PPU::hblank(Processor::_Memory& mem)
-{
-    if(ppu_mode != 0)
-    {
-        ppu_mode = 0;
-        if((mem.read(0xFF41) & 0x8) >> 3) //is hblank interrupt enabled
-            mem.write(0xFF0F, mem.read(0xFF0F, 0) | 0x2, 0); //fire stat
-        put_line(mem);
-    }
-    if(ppu_cycles == 204)
-        ppu_cycles = 0;
-}
-
-void PPU::vblank(Processor::_Memory& mem, sf::RenderWindow &window)
-{
-    //std::cout << "vblank!\n";
-    if(ppu_mode != 1)
-    {
-        mem.write(0xFF0F, mem.read(0xFF0F, 0) | 0x1, 0);
-        ppu_mode = 1;
-        if((mem.read(0xFF41) & 0x8) >> 3) //is vblank interrupt enabled
-            mem.write(0xFF0F, mem.read(0xFF0F, 0) | 0x2, 0); //fire stat
-        //draw_sprites(mem);
-        draw_frame(mem, window);
-        //draw_window(mem);
-        handle_input(mem);
-    }
 }
 
 void PPU::put_line(Processor::_Memory& mem)
@@ -283,30 +217,60 @@ void PPU::put_line(Processor::_Memory& mem)
     int SX,SY;
     SX = mem.read(0xFF43,0);
     SY = mem.read(0xFF42,0);
-    tilemap = (((mem.read(0xff40,0) >> 3) & 1) == 1) ? 0x9c00 : 0x9800; //put this elsewere
+    int WX,WY;
+    WX = mem.read(0xFF4B, 0) - 7;
+    WY = mem.read(0xFF4A, 0);
+    std::uint16_t bg_tilemap = (((mem.read(0xff40,0) >> 3) & 1) == 1) ? 0x9c00 : 0x9800;
+    std::uint16_t w_tilemap = (((mem.read(0xff40,0) >> 6) & 1) == 1) ? 0x9c00 : 0x9800;
     tiledata = (((mem.read(0xff40,0) >> 4) & 1) == 1) ? 0x8000 : 0x8800;
+    bool window_enabled = 0;
+    if((((mem.read(0xff40,0) & 0x20) >> 5)))
+        window_enabled = 1;
+
+    if(window_enabled)
+        tilemap = w_tilemap;
+    else
+        tilemap = bg_tilemap;
+    
+        
     uint16_t tile_start;
+
     for(int x = 0; x < 160; x++)
     {
         int y = ppu_line;
-        int tile_x = x % 8;
-        int tile_y = y % 8;
-        std::uint8_t tile_index = mem.read(tilemap + ((x + SX) % 256) / 8 + (((y + SY) % 256) / 8) * 32, 0);
+        int tile_x;
+        int tile_y;
+        std::uint8_t tile_index;
+        if(window_enabled)
+        {
+            tile_x = ((x + WX) % 256) % 8;
+            tile_y = ((y + WY) % 256) % 8;
+            tile_index = mem.read(tilemap + (x + WX) / 8 + ((y + WY) / 8) * 32, 0);
+        }
+        else
+        {
+            tile_x = ((x + SX) % 256) % 8;
+            tile_y = ((y + SY) % 256) % 8;
+            tile_index = mem.read(tilemap + ((x + SX) % 256) / 8 + (((y + SY) % 256) / 8) * 32, 0);
+        }
+        
+        
                 
-                if(tiledata == 0x8800)
-                {
-                    if(tile_index < 128)
-                        tile_start = 0x9000 + tile_index * 16;
-                    else
-                    {
-                        tile_start = 0x8800 + (tile_index - 128) * 16;
-                    }
-                        
-                }
-                else
-                {
-                    tile_start = tiledata + tile_index * 16;
-                }
+        if(tiledata == 0x8800)
+        {
+            if(tile_index < 128)
+                tile_start = 0x9000 + tile_index * 16;
+            else
+            {
+                tile_start = 0x8800 + (tile_index - 128) * 16;
+            }
+                
+        }
+        else
+        {
+            tile_start = tiledata + tile_index * 16;
+        }
+
         std::uint8_t data1 = mem.read(tile_start + 2 * tile_y, 0); 
         std::uint8_t data2 = mem.read(tile_start + 2 * tile_y + 1, 0);         
         bool b1 = (data1 >> (7 - tile_x)) & 1;

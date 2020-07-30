@@ -14,9 +14,10 @@ class Processor
         int rom_offset = 0;
         int ram_offset = 0;
         bool rom_mode = 1;
+        bool ram_enabled = 0;
         std::vector<unsigned char> rom;
         bool boot_enabled = 1;
-        unsigned char ram[32768];
+        unsigned char ram[1048576];
         unsigned char boot[0x100];
         std::uint64_t cycle_count {0};
         bool keystates[8] {0};
@@ -37,6 +38,7 @@ class Processor
         void write(unsigned short address, unsigned char value, bool cycles = 1);
         int cycles_taken {0};
         unsigned char read(unsigned short address, bool cycles = 1);
+
     }Memory;
     std::string to_hex(int x)
     {
