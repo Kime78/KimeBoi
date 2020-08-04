@@ -22,7 +22,7 @@ class PPU
     std::array<std::array<std::uint8_t, 144>, 160> pixel_array {1};
     std::array<Sprite,40> sprites;
     void fetch_pixel_array(Processor::_Memory mem);
-    void fetch_sprites(Processor::_Memory mem);
+    void fetch_sprites(Processor::_Memory& mem);
     void draw_sprites(Processor::_Memory mem);
     void draw_window(Processor::_Memory mem);
     PPU()
@@ -39,6 +39,7 @@ class PPU
     void vblank(Processor::_Memory& mem, sf::RenderWindow &window);
     void put_line(Processor::_Memory& mem);
     void draw_frame(Processor::_Memory& mem, sf::RenderWindow &window);
+    bool isBitSet(std::uint8_t num, std::uint8_t bit);
     int ppu_cycles {0}, ppu_mode, ppu_line {-1};
     bool in_vblank = 0;
     int LY;

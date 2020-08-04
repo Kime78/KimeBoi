@@ -111,6 +111,20 @@ void Processor::_Memory::write(unsigned short address, unsigned char value, bool
 {
 	if(cycles)
 		cycles_taken += 4;
+	if(address == 0xff46)
+	{
+		std::uint16_t src = value << 8;
+		for(int i = 0; i < 0xA0; i++)
+		{
+			if(value <= 0x7f)
+				ram[0xFE00 + i - 0x8000] = rom[src + i];
+			else
+			{
+				ram[0xFE00 + i - 0x8000] = ram[src + i - 0x8000];
+			}
+				 
+		}
+	}
 	if(address == 0xff00)
 	{
 		ram[0xff00 - 0x8000] = (value & 0b00110000) | (ram[0xff00 - 0x8000] & 0b11001111);
@@ -125,10 +139,13 @@ void Processor::_Memory::write(unsigned short address, unsigned char value, bool
 			ram_enabled = 0;	
 		return;	
 	}
-	if(address >= 0x2000 && address <= 0x4000) //rom switching
+	if(address >= 0x2000 && address < 0x4000) //rom switching
 	{
+		
+		std::uint8_t bank = value;
+		//bank = (value & 0b00011111) | (bank & 0b11100000);
 		if(rom_mode)
-			rom_offset = (value - 1) * 0x4000;
+			rom_offset = (bank - 1) * 0x4000;
 		return;
 	}
 	if(address >= 0x4000 && address <= 0x5FFF)

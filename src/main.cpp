@@ -51,22 +51,31 @@ int main(int argc, char** args)
         int cycles_taken = 0;
         cycles_taken = game.emulateCycle(); //this has timer and interrupts togheter
         ppu.tick_ppu(cycles_taken, game.Memory, window); 
-        //std::cout << std::hex << (int)game->Memory.read(0xFF0F,0) << '\n';
-        //fout << "PC:\t" << game.to_hex(game.pc) << ' '
-        //<< game.to_hex(game.Memory.read(game.pc, 0)) << ' ' 
-        //<< game.to_hex(game.Memory.read(game.pc + 1, 0)) << ' '
-        //<< game.to_hex(game.Memory.read(game.pc + 2, 0)) << ' '
-        //<< '\t' << "IE: " << game.to_hex(game.Memory.read(0xffff,0))
-        //<< ' ' << "IF: " << game.to_hex(game.Memory.read(0xff0f, 0))
-        //<< ' ' << game.IME 
-        //<< '\n';
-        //std::cout << (int)game.Memory.read(0xFF00, 0) << '\n';
-        //fout << game.to_hex(game.Memory.read(0xff00, 0)) << '\n';
+        bool debug = 1;
+        if(debug)
+        {
+            fout //<< '[' << game.to_hex(game.Memory.rom_offset / 0x4000) << ']' 
+            << ' '
+            << "PC: " << game.to_hex(game.pc) << ' '
+            << game.to_hex(game.Memory.read(game.pc, 0)) << ' ' 
+            << game.to_hex(game.Memory.read(game.pc + 1, 0)) << ' '
+            << game.to_hex(game.Memory.read(game.pc + 2, 0)) << '\t'
+            << "AF: " << game.to_hex((int)(game.Registers.A << 8 || game.Registers.F)) << ' '
+            //<< "BC: " << game.to_hex(game.Registers.B << 8 || game.Registers.C) << ' '
+            //<< "DE: " << game.to_hex(game.Registers.D << 8 || game.Registers.E) << ' '
+            //<< "HL: " << game.to_hex(game.Registers.H << 8 || game.Registers.L) << ' '
+            << '\n';
+        }
+        
         sf::Event event;
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
             {
+                for(int i = 0; i < 40; i++)
+                {
+                   // fout << game.to_hex(ppu.sprites[i].x) << ' ' << game.to_hex(ppu.sprites[i].y) << ' ' << game.to_hex(ppu.sprites[i].tile_id) //<< '\n'; 
+                }
                 fout.close();
                 window.close();
             }
