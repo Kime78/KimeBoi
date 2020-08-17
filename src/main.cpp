@@ -8,36 +8,40 @@ std::ofstream fout;
 
 int main(int argc, char** args)
 {
+
+    
     Processor game;
     fout.open("debug.out");
     game.initialise();
     PPU ppu;
     sf::RenderWindow window(sf::VideoMode(320, 288), "KimeBoi");
     window.setFramerateLimit(0);
-
+    std::cout << "test\n";
     if(argc < 2)
     {
+        std::cout << args[1];
         std::cout << "Booting test.gb\n";
-        FILE *file = fopen("E:\\CodeBlocks Projects (C# is better)\\KimeBoi\\bin\\boot.gb", "rb");
+        FILE *file = fopen("E:\\cpp_projects\\KimeBoi\\bin\\boot.gb", "rb");
         int pos = 0;
         while (fread(&game.Memory.boot[pos], 1, 1, file))
         {
             pos++;
         }
-        game.loadGame("E:\\CodeBlocks Projects (C# is better)\\KimeBoi\\bin\\test.gb");
+       // game.loadGame("E:\\cpp_projects\\KimeBoi\\bin\\test.gb");
     }
     else
     {
+        std::cout << args[0];
         std::cout << "Booting " << args[1] << "\n";
-        FILE *file = fopen("E:\\CodeBlocks Projects (C# is better)\\KimeBoi\\bin\\boot.gb", "rb");
+        FILE *file = fopen("E:\\cpp_projects\\KimeBoi\\bin\\boot.gb", "rb");
         int pos = 0;
         while (fread(&game.Memory.boot[pos], 1, 1, file))
         {
             pos++;
         }
-        game.loadGame(args[1]);
+       // game.loadGame(args[1]);
     }
-    
+    game.loadGame("E:\\cpp_projects\\KimeBoi\\bin\\test.gb");
     
     sf::Texture test_tex;
     sf::Uint8 draw_array [160 * 144 * 4] {0};
@@ -51,7 +55,7 @@ int main(int argc, char** args)
         int cycles_taken = 0;
         cycles_taken = game.emulateCycle(); //this has timer and interrupts togheter
         ppu.tick_ppu(cycles_taken, game.Memory, window); 
-        bool debug = 1;
+        bool debug = 0;
         if(debug)
         {
             fout //<< '[' << game.to_hex(game.Memory.rom_offset / 0x4000) << ']' 
@@ -83,6 +87,6 @@ int main(int argc, char** args)
         }
         
     }
-
+    
     return 0;
 }
