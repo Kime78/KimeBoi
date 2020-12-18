@@ -21,27 +21,27 @@ int main(int argc, char** args)
     {
         std::cout << args[1];
         std::cout << "Booting test.gb\n";
-        FILE *file = fopen("E:\\cpp_projects\\KimeBoi\\bin\\boot.gb", "rb");
+        FILE *file = fopen("./build/boot.gb", "rb");
         int pos = 0;
         while (fread(&game.Memory.boot[pos], 1, 1, file))
         {
             pos++;
         }
-       // game.loadGame("E:\\cpp_projects\\KimeBoi\\bin\\test.gb");
+        game.loadGame("./build/dmg-acid2.gb");
     }
     else
     {
         std::cout << args[0];
         std::cout << "Booting " << args[1] << "\n";
-        FILE *file = fopen("E:\\cpp_projects\\KimeBoi\\bin\\boot.gb", "rb");
+        FILE *file = fopen("./build/boot.gb", "rb");
         int pos = 0;
         while (fread(&game.Memory.boot[pos], 1, 1, file))
         {
             pos++;
         }
-       // game.loadGame(args[1]);
+        game.loadGame(args[1]);
     }
-    game.loadGame("E:\\cpp_projects\\KimeBoi\\bin\\test.gb");
+    //game.loadGame("./build/pokemon.gb");
     
     sf::Texture test_tex;
     sf::Uint8 draw_array [160 * 144 * 4] {0};
@@ -49,9 +49,9 @@ int main(int argc, char** args)
     test_tex.create(160,144);
     test_spr.setScale(sf::Vector2f(2.0f,2.0f));
     test_spr.setPosition(sf::Vector2f(0.0f,0.0f));
+
     while (window.isOpen())
     {   
-   
         int cycles_taken = 0;
         cycles_taken = game.emulateCycle(); //this has timer and interrupts togheter
         ppu.tick_ppu(cycles_taken, game.Memory, window); 
@@ -70,22 +70,7 @@ int main(int argc, char** args)
             //<< "HL: " << game.to_hex(game.Registers.H << 8 || game.Registers.L) << ' '
             << '\n';
         }
-        
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            if (event.type == sf::Event::Closed)
-            {
-                for(int i = 0; i < 40; i++)
-                {
-                   // fout << game.to_hex(ppu.sprites[i].x) << ' ' << game.to_hex(ppu.sprites[i].y) << ' ' << game.to_hex(ppu.sprites[i].tile_id) //<< '\n'; 
-                }
-                fout.close();
-                window.close();
-            }
-                
-        }
-        
+           
     }
     
     return 0;

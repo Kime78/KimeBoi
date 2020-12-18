@@ -275,6 +275,15 @@ void PPU::draw_frame(Processor::_Memory& mem, sf::RenderWindow &window)
         window.clear();
         window.draw(frame); //idk wtf to do about this ffs  
         window.display(); //this to
+
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            if (event.type == sf::Event::Closed)
+            {
+                window.close();
+            }       
+        }
 }
 
 void PPU::draw_sprites(Processor::_Memory& mem, uint8_t x, uint8_t y)
