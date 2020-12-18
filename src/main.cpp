@@ -15,8 +15,6 @@ int main(int argc, char** args)
     game.initialise();
     PPU ppu;
     sf::RenderWindow window(sf::VideoMode(320, 288), "KimeBoi");
-    window.setFramerateLimit(0);
-    std::cout << "test\n";
     if(argc < 2)
     {
         std::cout << args[1];
@@ -41,7 +39,6 @@ int main(int argc, char** args)
         }
         game.loadGame(args[1]);
     }
-    //game.loadGame("./build/pokemon.gb");
     
     sf::Texture test_tex;
     sf::Uint8 draw_array [160 * 144 * 4] {0};
@@ -49,7 +46,7 @@ int main(int argc, char** args)
     test_tex.create(160,144);
     test_spr.setScale(sf::Vector2f(2.0f,2.0f));
     test_spr.setPosition(sf::Vector2f(0.0f,0.0f));
-
+    window.setFramerateLimit(60);
     while (window.isOpen())
     {   
         int cycles_taken = 0;

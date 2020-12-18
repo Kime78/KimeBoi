@@ -23,11 +23,13 @@ bool PPU::isBitSet(std::uint8_t num, std::uint8_t bit)
 {
     return (num & (1 << bit));
 }
+
 void PPU::setBit (std::uint8_t& num, std::uint8_t bit, bool status)
 {
     if (isBitSet(num, bit) != status) 
         num ^= (1 << bit);
 }
+
 void PPU::tick_ppu(int cycles, Processor::_Memory& mem, sf::RenderWindow &window)
 {
     while(cycles >= 4)
@@ -100,7 +102,7 @@ void PPU::tick_ppu(int cycles, Processor::_Memory& mem, sf::RenderWindow &window
                 {
                     if(ppu_line == 144)
                     {
-                        ppu_line = 0;
+                        ppu_line = -1;
                         //LY = 0; //this should be at the end of vblank
                         PPU_mode = Vblank;
                         ppu_cycles = -4;
@@ -167,50 +169,52 @@ void PPU::put_line(Processor::_Memory& mem)
     tiledata = isBitSet(mem.read(0xff40, 0), 4) ? 0x8000 : 0x8800;
     tilemap = bg_tilemap;
     uint16_t tile_start;
-    for(int x = 0; x < 160; x++)
+    if(ppu_line != 144)
     {
-        if(isBitSet(mem.read(0xff40, 0), 7))
+        for(int x = 0; x < 160; x++)
         {
-            int y = ppu_line;
-            int tile_x;
-            int tile_y;
-            std::uint8_t tile_index;
-            
-           
-            tile_x = ((x + SX) % 256) % 8;
-            tile_y = ((y + SY) % 256) % 8;
-            tile_index = mem.read(tilemap + ((x + SX) % 256) / 8 + (((y + SY) % 256) / 8) * 32, 0);
-               
-            if(tiledata == 0x8800)
+            if(isBitSet(mem.read(0xff40, 0), 7))
             {
-                if(tile_index < 128)
-                    tile_start = 0x9000 + tile_index * 16;
+                int y = ppu_line;
+                int tile_x;
+                int tile_y;
+                std::uint8_t tile_index;
+                
+                tile_x = ((x + SX) % 256) % 8;
+                tile_y = ((y + SY) % 256) % 8;
+                tile_index = mem.read(tilemap + ((x + SX) % 256) / 8 + (((y + SY) % 256) / 8) * 32, 0);
+                
+                if(tiledata == 0x8800)
+                {
+                    if(tile_index < 128)
+                        tile_start = 0x9000 + tile_index * 16;
+                    else
+                    {
+                        tile_start = 0x8800 + (tile_index - 128) * 16;
+                    }               
+                }
                 else
                 {
-                    tile_start = 0x8800 + (tile_index - 128) * 16;
-                }               
+                    tile_start = tiledata + tile_index * 16;
+                }
+                std::uint8_t data1 = mem.read(tile_start + 2 * tile_y, 0); 
+                std::uint8_t data2 = mem.read(tile_start + 2 * tile_y + 1, 0);         
+                bool b1 = (data1 >> (7 - tile_x)) & 1;
+                bool b2 = (data2 >> (7 - tile_x)) & 1;
+                if(isBitSet(mem.read(0xff40, 0), 0))
+                    pixel_array[x][ppu_line] = b1 | (b2 << 1);
+                else
+                    pixel_array[x][ppu_line] = 0;
+
+                draw_window(mem, x, y);
+                draw_sprites(mem, x, y);           
             }
             else
             {
-                tile_start = tiledata + tile_index * 16;
-            }
-            std::uint8_t data1 = mem.read(tile_start + 2 * tile_y, 0); 
-            std::uint8_t data2 = mem.read(tile_start + 2 * tile_y + 1, 0);         
-            bool b1 = (data1 >> (7 - tile_x)) & 1;
-            bool b2 = (data2 >> (7 - tile_x)) & 1;
-            if(isBitSet(mem.read(0xff40, 0), 0))
-                pixel_array[x][ppu_line] = b1 | (b2 << 1);
-            else
                 pixel_array[x][ppu_line] = 0;
-            draw_window(mem, x, y);
-            draw_sprites(mem, x, y);    
-        }
-        else
-        {
-            pixel_array[x][ppu_line] = 0;
-        }
-    }    
-    
+            } 
+        } 
+    } 
 }
 
 void PPU::draw_frame(Processor::_Memory& mem, sf::RenderWindow &window)
@@ -261,8 +265,7 @@ void PPU::draw_frame(Processor::_Memory& mem, sf::RenderWindow &window)
                     else
                     {
                         //std::cout << (int)pixel_array[i][j] << " ";
-                    }
-                    
+                    }                  
             }
         }
         sf::Texture frame_texture;
@@ -327,7 +330,6 @@ void PPU::draw_sprites(Processor::_Memory& mem, uint8_t x, uint8_t y)
                             sprite_data2 = mem.read(sprite_tile_index + 2 * (sprite_tile_y) + 1, 0);
                         }
                         
-                        
                         bool sprite_b1, sprite_b2;
                         if(isBitSet(sprites[i].attributes, 5))
                         {
@@ -340,35 +342,65 @@ void PPU::draw_sprites(Processor::_Memory& mem, uint8_t x, uint8_t y)
                             sprite_b2 = (sprite_data2 >> (7 - sprite_tile_x)) & 1;
                         }
                         
-                        
                         std::uint8_t drawn_color = sprite_b1 | (sprite_b2 << 1);
-                        
-                            
-                        if(drawn_color == 0)
+                        if(isBitSet(sprites[i].attributes, 7))
                         {
-                            pixel_array[x][y] = color0;
-                            return;
+                            if(pixel_array[x][y] == 0)
+                            {
+                                 if(drawn_color == 0)
+                                {
+                                    pixel_array[x][y] = color0;
+                                    return;
+                                }
+                                else if(drawn_color == 1)
+                                {
+                                    pixel_array[x][y] = color1;     
+                                    return;
+                                }
+                                else if(drawn_color == 2)
+                                {
+                                    pixel_array[x][y] = color2;
+                                    return;
+                                }
+                                else if(drawn_color == 3)
+                                {
+                                    pixel_array[x][y] = color3;
+                                    return;
+                                }
+                                else 
+                                {
+                                    pixel_array[x][y] = 04; //error
+                                }   
+                            }
                         }
-                        else if(drawn_color == 1)
+                        else
                         {
-                            pixel_array[x][y] = color1;     
-                            return;
+                            if(drawn_color == 0)
+                            {
+                                pixel_array[x][y] = color0;
+                                return;
+                            }
+                            else if(drawn_color == 1)
+                            {
+                                pixel_array[x][y] = color1;     
+                                return;
+                            }
+                            else if(drawn_color == 2)
+                            {
+                                pixel_array[x][y] = color2;
+                                return;
+                            }
+                            else if(drawn_color == 3)
+                            {
+                                pixel_array[x][y] = color3;
+                                return;
+                            }
+                            else 
+                            {
+                                pixel_array[x][y] = 04; //error
+                            }   
                         }
-                        else if(drawn_color == 2)
-                        {
-                            pixel_array[x][y] = color2;
-                            return;
-                        }
-                        else if(drawn_color == 3)
-                        {
-                            pixel_array[x][y] = color3;
-                            return;
-                        }
-                        else 
-                        {
-                            pixel_array[x][y] = 04; //error
-                        }   
-                    }        
+                    }       
                 }   
     }
 }
