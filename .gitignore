@@ -8,3 +8,11 @@ bin/tetris - requires MBC.gb
 src/problems.txt
 mooneye/
 build/
+_deps
+CMakeFiles
+boot.gb
+cmake_install.cmake
+CMakeCache.txt
+dmg-acid2.gb
+Makefile
+KimeBoi
